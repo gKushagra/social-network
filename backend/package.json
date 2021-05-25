@@ -1,0 +1,32 @@
+{
+  "name": "social-network-server",
+  "version": "0.0.1",
+  "description": "socket server + http server based on REST for social-network client ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "http-server": "nodemon ./http-server/server.js",
+    "socket-server": "nodemon ./socket-server/server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "socketio",
+    "ws",
+    "expressjs",
+    "multer"
+  ],
+  "author": "Kushagra Gupta <dev.gkushagra@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.11",
+    "nodemailer": "^6.6.1",
+    "nodemon": "^2.0.7",
+    "uuid": "^8.3.2"
+  }
+}

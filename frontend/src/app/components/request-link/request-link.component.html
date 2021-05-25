@@ -1,0 +1,18 @@
+<div
+  fxLayout="row"
+  fxLayoutAlign="center center"
+  style="width: 100%; height: 100%"
+>
+  <mat-card fxFlex="22">
+    <div fxLayout="column">
+        <mat-form-field fxFlex>
+          <mat-label>Email</mat-label>
+          <input [formControl]="email" type="text" matInput />
+        </mat-form-field>
+        <button mat-flat-button type="button" (click)="tryResetLink()" color="primary">Request Link</button>
+      <button mat-button (click)="goToLogin()" color="secondary">
+        Back to Login
+      </button>
+    </div>
+  </mat-card>
+</div>

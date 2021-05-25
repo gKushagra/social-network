@@ -1,0 +1,27 @@
+<div
+  fxLayout="row"
+  fxLayoutAlign="center center"
+  style="width: 100%; height: 100%"
+>
+  <mat-card fxFlex="22">
+    <div fxLayout="column">
+      <form
+        [formGroup]="signupForm"
+        (ngSubmit)="trySignup()"
+        fxLayout="column"
+        fxFlex
+      >
+        <mat-form-field fxFlex>
+          <mat-label>Email</mat-label>
+          <input formControlName="email" type="text" matInput />
+        </mat-form-field>
+        <mat-form-field fxFlex>
+          <mat-label>Password</mat-label>
+          <input formControlName="password" type="password" matInput />
+        </mat-form-field>
+        <button mat-flat-button type="submit" color="primary">Sign Up</button>
+      </form>
+      <button mat-button (click)="goToLogin()" color="secondary">Login</button>
+    </div>
+  </mat-card>
+</div>
