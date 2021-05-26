@@ -19,6 +19,7 @@ db.once("open", () => {
 require("./models");
 const User = mongoose.model("User");
 const Reset = mongoose.model("Reset");
+const Contact = mongoose.model("Contact");
 
 /**
  * This method checks if a user exists
@@ -40,6 +41,7 @@ const loginController = (req, res) => {
       if (isVerified) {
         return res.status(200).json({
           token: jwt.sign({ user: data.email }, process.env.tokenSkt),
+          data: { id: user[0].id, email: user[0].email }
         });
       } else return res.sendStatus(401);
     } else return res.sendStatus(400);
@@ -73,6 +75,7 @@ const signupController = (req, res) => {
 
         return res.status(200).json({
           token: jwt.sign({ user: data.email }, process.env.tokenSkt),
+          data: { id: user.id, email: user.email }
         });
       });
     }
@@ -160,9 +163,78 @@ const getResetLinkController = (req, res) => {
   });
 };
 
+/**
+ * get all users on app
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const getUsers = (req, res) => {
+  User.find({}, (err, users) => {
+    if (err) return res.sendStatus(500);
+    users = users.map(user => {
+      return {
+        id: user.id,
+        email: user.email
+      }
+    });
+    return res.status(200).json({ users: users })
+  });
+}
+
+/**
+ * get contacts for a user
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const getContacts = (req, res) => {
+  const contactOwnerId = req.params.id;
+  Contact.find({ contactOwnerId: contactOwnerId }, (err, contacts) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(200).json({ contacts: contacts });
+  });
+}
+
+/**
+ * add user to contact list
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const addContact = (req, res) => {
+  const data = req.body;
+  const contact = new Contact({
+    contactOwnerId: data.ownerId,
+    contactUserId: data.userId,
+    contactUserEmail: data.userEmail
+  });
+  contact.save((err, c) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(201).json('contact added successfully');
+  })
+}
+
+/**
+ * remove a user from contact list
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const removeContact = (req, res) => {
+  const contactUserId = req.params.id;
+  Contact.findOneAndDelete({ contactUserId: contactUserId }, (err, c) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(200).json('contact removed successfully');
+  });
+}
+
 module.exports = {
   loginController,
   signupController,
   resetController,
   getResetLinkController,
+  getUsers,
+  getContacts,
+  addContact,
+  removeContact,
 };

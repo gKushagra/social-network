@@ -44,3 +44,11 @@ ResetSchema.methods.addResetRequest = function (email, id) {
 };
 
 mongoose.model("Reset", ResetSchema);
+
+const ContactSchema = new Schema({
+  contactOwnerId: String,
+  contactUserId: String,
+  contactUserEmail: String
+})
+
+mongoose.model("Contact", ContactSchema);

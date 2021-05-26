@@ -5,6 +5,8 @@
 export const environment = {
   production: false,
   authenticationUrl: "http://localhost:4050/auth/",
+  usersUrl: "http://localhost:4050/users",
+  contactsUrl: "http://localhost:4050/contacts"
 };
 
 /*

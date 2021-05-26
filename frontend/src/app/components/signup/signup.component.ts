@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-signup',
@@ -18,6 +19,7 @@ export class SignupComponent implements OnInit {
   constructor(
     private authenticationService: AuthenticationService,
     private router: Router,
+    private userService: UserService,
   ) { }
 
   ngOnInit(): void {
@@ -30,12 +32,16 @@ export class SignupComponent implements OnInit {
     this.authenticationService.signup(this.signupForm.value)
       .subscribe((res: any) => {
         console.log(res);
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('_user', JSON.stringify(res.data));
+        this.userService.currUser = res.data;
       }, (error) => {
         // Show Error
         if (error.status === 409) console.log("User Exists");
         if (error.status === 500) console.log("Server Error");
       }, () => {
         // redirect to home
+        this.router.navigate(['home']);
       });
   }
 

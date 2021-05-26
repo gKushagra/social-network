@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthenticationService } from "../../services/authentication.service";
+import { UserService } from "../../services/user.service";
 
 @Component({
   selector: 'app-login',
@@ -18,6 +19,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private authenticationService: AuthenticationService,
     private router: Router,
+    private userService: UserService,
   ) { }
 
   ngOnInit(): void {
@@ -30,6 +32,9 @@ export class LoginComponent implements OnInit {
     this.authenticationService.login(this.loginForm.value)
       .subscribe((res: any) => {
         console.log(res);
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('_user', JSON.stringify(res.data));
+        this.userService.currUser = res.data;
       }, (error) => {
         // show error
         if (error.status === 401) console.log("User does not exist");
@@ -37,6 +42,7 @@ export class LoginComponent implements OnInit {
         if (error.status === 500) console.log("Server Error");
       }, () => {
         // redirect to home
+        this.router.navigate(['home']);
       });
   }
 

@@ -1,0 +1,45 @@
+<div style="width: 100%; height: 100%;">
+    <div fxLayout="column" style="width: 100%;">
+        <!-- search users -->
+        <div fxLayout="row" style="width: 100%;">
+            <div fxFlex="5"></div>
+            <mat-form-field fxFlex>
+                <mat-label>Search User</mat-label>
+                <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
+                <mat-autocomplete autActiveFirstOption #auto="matAutocomplete">
+                    <mat-option *ngFor="let option of filteredOptions | async" [value]="option.email">
+                        <div fxLayout="row">
+                            <div>{{ option.email }}</div>
+                            <div fxFlex></div>
+                            <button matTooltip="Add User" (click)="addContact(option)" mat-icon-button>
+                                <mat-icon>add</mat-icon>
+                            </button>
+                        </div>
+
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+            <div fxFlex="5"></div>
+        </div>
+        <!-- contacts -->
+        <div fxLayout="row" style="width: 100%;">
+            <div fxFlex="5"></div>
+            <mat-selection-list #selectedContact [multiple]="false" fxFlex>
+                <div mat-subheader>Contacts</div>
+                <mat-list-option *ngFor="let contact of contacts" [value]="contact">
+                    <mat-icon mat-list-icon>account_circle</mat-icon>
+                    <div mat-line>{{contact.contactUserEmail.split('@')[0]}}</div>
+                </mat-list-option>
+            </mat-selection-list>
+            <div>{{selectedContact.selectedOptions.selected[0]?.value ?
+                selectContact(selectedContact.selectedOptions.selected[0]?.value): '' }}</div>
+            <div fxFlex="5"></div>
+        </div>
+        <!-- logout -->
+        <div fxLayout="row" style="width: 100%;">
+            <div fxFlex="5"></div>
+            <button (click)="tryLogout()" color="secondary" fxFlex mat-stroked-button>Logout</button>
+            <div fxFlex="5"></div>
+        </div>
+    </div>
+</div>
