@@ -6,7 +6,9 @@ export const environment = {
   production: false,
   authenticationUrl: "http://localhost:4050/auth/",
   usersUrl: "http://localhost:4050/users",
-  contactsUrl: "http://localhost:4050/contacts"
+  contactsUrl: "http://localhost:4050/contacts",
+  socketUrl: 'ws://localhost:4051',
+  reconnectInterval: 2000
 };
 
 /*

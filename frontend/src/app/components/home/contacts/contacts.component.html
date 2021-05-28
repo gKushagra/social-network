@@ -12,7 +12,7 @@
                             <div>{{ option.email }}</div>
                             <div fxFlex></div>
                             <button matTooltip="Add User" (click)="addContact(option)" mat-icon-button>
-                                <mat-icon>add</mat-icon>
+                                <mat-icon>person_add</mat-icon>
                             </button>
                         </div>
 
@@ -27,8 +27,20 @@
             <mat-selection-list #selectedContact [multiple]="false" fxFlex>
                 <div mat-subheader>Contacts</div>
                 <mat-list-option *ngFor="let contact of contacts" [value]="contact">
-                    <mat-icon mat-list-icon>account_circle</mat-icon>
-                    <div mat-line>{{contact.contactUserEmail.split('@')[0]}}</div>
+                    <div mat-line>
+                        <div fxFlex="row" fxLayoutAlign="start center">
+                            <div [ngClass]="isActive(contact.contactUserId) ? 'active-av':'av'">
+                                {{(contact.contactUserEmail.split('@')[0]|slice:0:1)|uppercase}}
+                            </div>
+                            <div fxFlex="2"></div>
+                            <div>{{contact.contactUserEmail.split('@')[0]}}</div>
+                            <div fxFlex></div>
+                            <!-- <div>{{ isActive(contact.contactUserId) ? 'Active' : '' }}</div> -->
+                            <button matTooltip="Remove Contact" mat-icon-button>
+                                <mat-icon>person_remove</mat-icon>
+                            </button>
+                        </div>
+                    </div>
                 </mat-list-option>
             </mat-selection-list>
             <div>{{selectedContact.selectedOptions.selected[0]?.value ?

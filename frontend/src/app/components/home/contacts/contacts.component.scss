@@ -7,3 +7,22 @@
 .example-full-width {
   width: 100%;
 }
+
+.active-av,
+.av {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  font-size: 24px;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+}
+
+.active-av {
+  border: 2px solid #9ccc65;
+}
+
+.av {
+  border: 1px solid gainsboro;
+}

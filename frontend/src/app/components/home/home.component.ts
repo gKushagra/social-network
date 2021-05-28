@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
+import { SocketService } from "src/app/services/socket.service";
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -9,9 +11,12 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class HomeComponent implements OnInit {
 
+  ws: WebSocket;
+
   constructor(
     private router: Router,
     private userService: UserService,
+    private socketService: SocketService,
   ) { }
 
   ngOnInit(): void {
@@ -20,7 +25,7 @@ export class HomeComponent implements OnInit {
       this.router.navigate(['login']);
     }
 
-    if(!this.userService.currUser) {
+    if (!this.userService.currUser) {
       this.userService.currUser = JSON.parse(localStorage.getItem('_user'));
     }
 
@@ -34,6 +39,18 @@ export class HomeComponent implements OnInit {
         this.userService.contacts = res.contacts;
         this.userService.refreshAvlContacts();
       });
+
+    this.connectToWs();
+  }
+
+  private connectToWs(): void {
+    this.socketService.connect();
+    setTimeout(() => {
+      this.socketService.sendMessage({
+        type: "authenticate",
+        data: this.userService.currUser
+      });
+    }, 2000);
   }
 
   private isAuthenticated(): boolean {

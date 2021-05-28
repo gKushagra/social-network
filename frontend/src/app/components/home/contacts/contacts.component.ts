@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, startWith } from "rxjs/operators";
 import { Contact, User } from 'src/app/models/common';
+import { SocketService } from 'src/app/services/socket.service';
 import { UserService } from 'src/app/services/user.service';
 import { ChatService } from "../../../services/chat.service";
 
@@ -18,11 +19,13 @@ export class ContactsComponent implements OnInit {
   options: User[] = [];
   filteredOptions: Observable<User[]>;
   contacts: Contact[] = [];
+  activeUsers: any = [];
 
   constructor(
     private chatService: ChatService,
     private userService: UserService,
     private router: Router,
+    private socketService: SocketService,
   ) { }
 
   ngOnInit(): void {
@@ -57,6 +60,12 @@ export class ContactsComponent implements OnInit {
       startWith(''),
       map(value => this._filter(value))
     );
+
+    this.socketService.observeNewMessage.subscribe(msg => {
+      if (msg.type === "active-users") {
+        this.activeUsers = msg.data;
+      }
+    });
   }
 
   private _filter(value: string): User[] {
@@ -112,9 +121,20 @@ export class ContactsComponent implements OnInit {
       });
   }
 
+  isActive(id: any): boolean {
+    let activeUser = this.activeUsers.filter(user => {
+      return user.id === id
+    });
+    console.log(activeUser);
+    if (activeUser.length > 0) return true;
+    else return false;
+  }
+
   public tryLogout(): void {
     localStorage.removeItem('token');
-    this.router.navigate(['login']);
+    localStorage.removeItem('_user');
+    this.socketService.close();
+    window.location.replace('http://localhost:4240/login');
   }
 
 }
