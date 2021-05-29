@@ -7,6 +7,7 @@ export const environment = {
   authenticationUrl: "http://localhost:4050/auth/",
   usersUrl: "http://localhost:4050/users",
   contactsUrl: "http://localhost:4050/contacts",
+  requestUrl: "http://localhost:4050/requests",
   socketUrl: 'ws://localhost:4051',
   reconnectInterval: 2000
 };

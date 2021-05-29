@@ -26,18 +26,25 @@ export class HomeComponent implements OnInit {
     }
 
     if (!this.userService.currUser) {
-      this.userService.currUser = JSON.parse(localStorage.getItem('_user'));
+      this.userService.currUser = JSON.parse(sessionStorage.getItem('_user'));
     }
 
     this.userService.getUsers()
       .subscribe((res: any) => {
         this.userService.users = res.users;
         this.userService.refreshAvlUsers();
-      })
+      });
+
     this.userService.getContacts()
       .subscribe((res: any) => {
         this.userService.contacts = res.contacts;
         this.userService.refreshAvlContacts();
+      });
+
+    this.userService.getRequests()
+      .subscribe((res: any) => {
+        this.userService.requests = res.requests;
+        this.userService.refreshAvlRequests();
       });
 
     this.connectToWs();
@@ -54,7 +61,7 @@ export class HomeComponent implements OnInit {
   }
 
   private isAuthenticated(): boolean {
-    if (localStorage.getItem('token'))
+    if (sessionStorage.getItem('token'))
       return true;
     else return false;
   } ƒ

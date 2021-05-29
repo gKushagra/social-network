@@ -20,6 +20,8 @@ export class ContactsComponent implements OnInit {
   filteredOptions: Observable<User[]>;
   contacts: Contact[] = [];
   activeUsers: any = [];
+  requests: Request[] = [];
+  currUser: User;
 
   constructor(
     private chatService: ChatService,
@@ -39,11 +41,14 @@ export class ContactsComponent implements OnInit {
     this.contacts = this.userService.contacts;
     console.log(this.contacts);
 
+    this.currUser = this.userService.currUser;
+
     this.userService.observeAvlUsers.subscribe(avl => {
       if (avl) {
         this.options = this.userService.users;
         this.options = this.options.filter(user => {
-          return user.id !== this.userService.currUser.id
+          return user.id !== this.userService.currUser.id &&
+            this.contacts.findIndex(c => c.contactUserId === user.id) < 0
         });
         console.log(this.options);
       }
@@ -53,6 +58,13 @@ export class ContactsComponent implements OnInit {
       if (avl) {
         this.contacts = this.userService.contacts;
         console.log(this.contacts);
+      }
+    });
+
+    this.userService.observeAvlRequests.subscribe(avl => {
+      if (avl) {
+        this.requests = this.userService.requests;
+        console.log(this.requests);
       }
     });
 
@@ -121,6 +133,24 @@ export class ContactsComponent implements OnInit {
       });
   }
 
+  addRequest(): void {
+
+  }
+
+  acceptRequest(request: any): void {
+
+  }
+
+  cancelRequest(): void {
+
+  }
+
+  getUserEmail(id: any): any {
+    return this.userService.users.filter(user => {
+      return user.id === id
+    })[0].email;
+  }
+
   isActive(id: any): boolean {
     let activeUser = this.activeUsers.filter(user => {
       return user.id === id
@@ -131,8 +161,8 @@ export class ContactsComponent implements OnInit {
   }
 
   public tryLogout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('_user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('_user');
     this.socketService.close();
     window.location.replace('http://localhost:4240/login');
   }

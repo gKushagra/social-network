@@ -8,3 +8,10 @@ export interface Contact {
     contactUserId: string,
     contactUserEmail: string
 }
+
+export interface Request {
+    requestId: string,
+    fromUserId: string,
+    toUserId: string,
+    status: boolean
+}

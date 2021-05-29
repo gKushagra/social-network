@@ -20,6 +20,7 @@ require("./models");
 const User = mongoose.model("User");
 const Reset = mongoose.model("Reset");
 const Contact = mongoose.model("Contact");
+const Request = mongoose.model("Request");
 
 /**
  * This method checks if a user exists
@@ -228,6 +229,81 @@ const removeContact = (req, res) => {
   });
 }
 
+/**
+ * get all requests for user
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const getRequests = (req, res) => {
+  const requestToId = req.params.id;
+  Request.find({ toUserId: requestToId, status: 1 }, (err, requests) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(200).json({ requests: requests });
+  });
+}
+
+/**
+ * add a new request to user
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const addRequest = (req, res) => {
+  const data = req.body;
+  const request = new Request({
+    requestId: null,
+    fromUserId: data.fromUserId,
+    toUserId: data.toUserId,
+    status: 1
+  });
+  request.save((err, c) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(201).json('request sent successfully');
+  })
+}
+
+/**
+ * accept request
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const acceptRequest = (req, res) => {
+  const data = req.body;
+
+  for (let i = 0; i < 2; i++) {
+
+    const contact = new Contact({
+      contactOwnerId: data[i].ownerId,
+      contactUserId: data[i].userId,
+      contactUserEmail: data[i].userEmail
+    });
+    contact.save((err, c) => {
+      if (err) return res.sendStatus(500);
+    });
+  }
+
+  Contact.findOneAndUpdate({ requestId: req.params.id }, { status: 0 }, (err, c) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(200).json('contact added');
+  });
+}
+
+/**
+ * delete request
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const setRequestInactive = (req, res) => {
+  const requestId = req.params.id;
+  Contact.findOneAndUpdate({ requestId: requestId }, { status: 0 }, (err, c) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(200).json('request status set inactive');
+  });
+}
+
 module.exports = {
   loginController,
   signupController,
@@ -237,4 +313,8 @@ module.exports = {
   getContacts,
   addContact,
   removeContact,
+  getRequests,
+  addRequest,
+  acceptRequest,
+  setRequestInactive,
 };

@@ -1,9 +1,24 @@
 <div style="width: 100%; height: 100%;">
     <div fxLayout="column" style="width: 100%;">
-        <!-- search users -->
-        <div fxLayout="row" style="width: 100%;">
+        <!-- curr user -->
+        <div fxLayout="row" fxLayoutAlign="start center" style="margin-top: 21px;">
             <div fxFlex="5"></div>
-            <mat-form-field fxFlex>
+            <div [ngClass]="isActive(currUser.id) ? 'active-av':'av'">
+                {{ (currUser.email[0]|slice:0:1)|uppercase }}
+            </div>
+            <div fxFlex="2"></div>
+            <div class="mat-title" style="margin-bottom: 0 !important;">{{ currUser.email.split('@')[0]|uppercase }}
+            </div>
+            <div fxFlex></div>
+            <!-- logout -->
+            <button (click)="tryLogout()" color="secondary" fxFlex mat-stroked-button>Logout</button>
+            <div fxFlex="5"></div>
+        </div>
+        <mat-divider style="margin-top: 21px;"></mat-divider>
+        <!-- search users -->
+        <div fxLayout="row" style="width: 100%; margin-top: 21px;">
+            <div fxFlex="5"></div>
+            <mat-form-field appearance="outline" fxFlex>
                 <mat-label>Search User</mat-label>
                 <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
                 <mat-autocomplete autActiveFirstOption #auto="matAutocomplete">
@@ -21,37 +36,74 @@
             </mat-form-field>
             <div fxFlex="5"></div>
         </div>
-        <!-- contacts -->
-        <div fxLayout="row" style="width: 100%;">
-            <div fxFlex="5"></div>
-            <mat-selection-list #selectedContact [multiple]="false" fxFlex>
-                <div mat-subheader>Contacts</div>
-                <mat-list-option *ngFor="let contact of contacts" [value]="contact">
-                    <div mat-line>
-                        <div fxFlex="row" fxLayoutAlign="start center">
-                            <div [ngClass]="isActive(contact.contactUserId) ? 'active-av':'av'">
-                                {{(contact.contactUserEmail.split('@')[0]|slice:0:1)|uppercase}}
+        <mat-accordion>
+            <!-- contacts -->
+            <mat-expansion-panel expanded=false class="mat-elevation-z0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Contacts
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="row" style="width: 100%;">
+                    <!-- <div fxFlex="5"></div> -->
+                    <mat-selection-list #selectedContact [multiple]="false" fxFlex>
+                        <mat-list-option *ngFor="let contact of contacts" [value]="contact">
+                            <div mat-line>
+                                <div fxFlex="row" fxLayoutAlign="start center">
+                                    <div [ngClass]="isActive(contact.contactUserId) ? 'active-av':'av'">
+                                        {{(contact.contactUserEmail.split('@')[0]|slice:0:1)|uppercase}}
+                                    </div>
+                                    <div fxFlex="2"></div>
+                                    <div>{{contact.contactUserEmail.split('@')[0]}}</div>
+                                    <div fxFlex></div>
+                                    <!-- <div>{{ isActive(contact.contactUserId) ? 'Active' : '' }}</div> -->
+                                    <button matTooltip="Remove Contact" mat-icon-button>
+                                        <mat-icon>person_remove</mat-icon>
+                                    </button>
+                                </div>
                             </div>
-                            <div fxFlex="2"></div>
-                            <div>{{contact.contactUserEmail.split('@')[0]}}</div>
-                            <div fxFlex></div>
-                            <!-- <div>{{ isActive(contact.contactUserId) ? 'Active' : '' }}</div> -->
-                            <button matTooltip="Remove Contact" mat-icon-button>
-                                <mat-icon>person_remove</mat-icon>
-                            </button>
-                        </div>
-                    </div>
-                </mat-list-option>
-            </mat-selection-list>
-            <div>{{selectedContact.selectedOptions.selected[0]?.value ?
-                selectContact(selectedContact.selectedOptions.selected[0]?.value): '' }}</div>
+                        </mat-list-option>
+                    </mat-selection-list>
+                    <div>{{selectedContact.selectedOptions.selected[0]?.value ?
+                        selectContact(selectedContact.selectedOptions.selected[0]?.value): '' }}</div>
+                    <!-- <div fxFlex="5"></div> -->
+                </div>
+            </mat-expansion-panel>
+            <!-- Requests -->
+            <mat-expansion-panel expanded=false class="mat-elevation-z0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Requests
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="row" style="width: 100%;">
+                    <div fxFlex="5"></div>
+                    <mat-selection-list #selectedRequest [multiple]="false" fxFlex>
+                        <mat-list-option *ngFor="let request of requests" [value]="request">
+                            <div mat-line>
+                                <div fxFlex="row" fxLayoutAlign="start center">
+                                    <div>{{ getUserEmail(request.fromUserId) |lowercase}}</div>
+                                    <div fxFlex></div>
+                                    <button matTooltip="Accept Request" mat-icon-button>
+                                        <mat-icon>check_circle</mat-icon>
+                                    </button>
+                                    <button matTooltip="Remove Request" mat-icon-button>
+                                        <mat-icon>cancel</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </mat-list-option>
+                    </mat-selection-list>
+                    <div>{{selectedRequest.selectedOptions.selected[0]?.value ?
+                        acceptRequest(selectedRequest.selectedOptions.selected[0]?.value): '' }}</div>
+                    <div fxFlex="5"></div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+        <!-- <div fxLayout="row" style="width: 100%;">
             <div fxFlex="5"></div>
-        </div>
-        <!-- logout -->
-        <div fxLayout="row" style="width: 100%;">
-            <div fxFlex="5"></div>
-            <button (click)="tryLogout()" color="secondary" fxFlex mat-stroked-button>Logout</button>
-            <div fxFlex="5"></div>
-        </div>
+            <div class="mat-subheading-1">Contacts</div>
+            <div fxFlex></div>
+        </div> -->
     </div>
 </div>

@@ -12,12 +12,16 @@ export class UserService {
   public currUser: User;
   public users: User[] = []
   public contacts: Contact[] = [];
+  public requests: Request[] = [];
 
   private availableUsers: Subject<boolean> = new Subject();
   public observeAvlUsers: Observable<boolean> = this.availableUsers.asObservable();
 
   private availableContacts: Subject<boolean> = new Subject();
   public observeAvlContacts: Observable<boolean> = this.availableContacts.asObservable();
+
+  private availableRequests: Subject<boolean> = new Subject();
+  public observeAvlRequests: Observable<boolean> = this.availableRequests.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -39,11 +43,27 @@ export class UserService {
     return this.http.get(environment.contactsUrl + `/${contactUserId}`);
   }
 
+  getRequests(): any {
+    return this.http.get(environment.requestUrl + `/${this.currUser.id}`);
+  }
+
+  addRequest(payload): any {
+    return this.http.post(environment.requestUrl, payload);
+  }
+
+  setRequestInactive(requestId): any {
+    return this.http.put(environment.requestUrl + `/${requestId}`, {});
+  }
+
   refreshAvlUsers(): void {
     this.availableUsers.next(true);
   }
 
   refreshAvlContacts(): void {
     this.availableContacts.next(true);
+  }
+
+  refreshAvlRequests(): void {
+    this.availableRequests.next(true);
   }
 }

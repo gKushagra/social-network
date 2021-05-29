@@ -52,3 +52,12 @@ const ContactSchema = new Schema({
 })
 
 mongoose.model("Contact", ContactSchema);
+
+const RequestSchema = new Schema({
+  requestId: String,
+  fromUserId: String,
+  toUserId: String,
+  status: Boolean,
+});
+
+mongoose.model("Request", RequestSchema);
