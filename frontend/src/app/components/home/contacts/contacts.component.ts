@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, startWith } from "rxjs/operators";
-import { Contact, User } from 'src/app/models/common';
+import { Contact, Request, User } from 'src/app/models/common';
 import { SocketService } from 'src/app/services/socket.service';
 import { UserService } from 'src/app/services/user.service';
 import { ChatService } from "../../../services/chat.service";
@@ -21,6 +21,7 @@ export class ContactsComponent implements OnInit {
   contacts: Contact[] = [];
   activeUsers: any = [];
   requests: Request[] = [];
+  sentRequests: Request[] = [];
   currUser: User;
 
   constructor(
@@ -43,6 +44,8 @@ export class ContactsComponent implements OnInit {
 
     this.currUser = this.userService.currUser;
 
+    this.requests = this.userService.requests;
+
     this.userService.observeAvlUsers.subscribe(avl => {
       if (avl) {
         this.options = this.userService.users;
@@ -64,7 +67,8 @@ export class ContactsComponent implements OnInit {
     this.userService.observeAvlRequests.subscribe(avl => {
       if (avl) {
         this.requests = this.userService.requests;
-        console.log(this.requests);
+        this.sentRequests = this.userService.sentRequests;
+        console.log(this.requests, this.sentRequests);
       }
     });
 
@@ -133,16 +137,64 @@ export class ContactsComponent implements OnInit {
       });
   }
 
-  addRequest(): void {
-
+  addRequest(_user: any): void {
+    this.userService.addRequest({
+      fromUserId: this.userService.currUser.id,
+      toUserId: _user.id
+    }).subscribe((res: any) => {
+      console.log(res);
+    }, (error) => {
+      if (error.status === 500) console.log("Server Error");
+    }, () => {
+      this.userService.getRequests()
+        .subscribe((res: any) => {
+          this.userService.requests = res.requests;
+          this.userService.sentRequests = res.sentRequests;
+          this.userService.refreshAvlRequests();
+        });
+    });
   }
 
-  acceptRequest(request: any): void {
-
+  /**
+   * add to contacts for fromUserId and toUserId and
+   * change status to 0
+   * @param request Request received or sent
+   */
+  acceptRequest(request: Request): void {
+    this.userService.acceptRequest({
+      requestId: request.requestId,
+      fromUserId: request.fromUserId,
+      fromUserEmail: this.getUserEmail(request.fromUserId),
+      toUserId: request.toUserId,
+      toUserEmail: this.getUserEmail(request.toUserId)
+    }).subscribe((res: any) => {
+      console.log(res);
+    }, (error) => {
+      if (error.status === 500) console.log("Server Error");
+    }, () => {
+      this.userService.getRequests()
+        .subscribe((res: any) => {
+          this.userService.requests = res.requests;
+          this.userService.sentRequests = res.sentRequests;
+          this.userService.refreshAvlRequests();
+        });
+    });
   }
 
-  cancelRequest(): void {
-
+  cancelRequest(request: Request): void {
+    this.userService.declineRequest(request.requestId)
+      .subscribe((res: any) => {
+        console.log(res);
+      }, (error) => {
+        if (error.status === 500) console.log("Server Error");
+      }, () => {
+        this.userService.getRequests()
+          .subscribe((res: any) => {
+            this.userService.requests = res.requests;
+            this.userService.sentRequests = res.sentRequests;
+            this.userService.refreshAvlRequests();
+          });
+      });
   }
 
   getUserEmail(id: any): any {

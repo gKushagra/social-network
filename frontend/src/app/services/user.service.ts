@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { User, Contact } from "../models/common";
+import { User, Contact, Request } from "../models/common";
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +13,7 @@ export class UserService {
   public users: User[] = []
   public contacts: Contact[] = [];
   public requests: Request[] = [];
+  public sentRequests: Request[] = [];
 
   private availableUsers: Subject<boolean> = new Subject();
   public observeAvlUsers: Observable<boolean> = this.availableUsers.asObservable();
@@ -51,7 +52,11 @@ export class UserService {
     return this.http.post(environment.requestUrl, payload);
   }
 
-  setRequestInactive(requestId): any {
+  acceptRequest(payload): any {
+    return this.http.put(environment.requestUrl, payload);
+  }
+
+  declineRequest(requestId): any {
     return this.http.put(environment.requestUrl + `/${requestId}`, {});
   }
 

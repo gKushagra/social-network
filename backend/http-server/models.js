@@ -60,4 +60,8 @@ const RequestSchema = new Schema({
   status: Boolean,
 });
 
+RequestSchema.methods.addNewRequest = function () {
+  this.requestId = uuid();
+}
+
 mongoose.model("Request", RequestSchema);

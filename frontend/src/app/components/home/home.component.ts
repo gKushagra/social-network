@@ -44,6 +44,7 @@ export class HomeComponent implements OnInit {
     this.userService.getRequests()
       .subscribe((res: any) => {
         this.userService.requests = res.requests;
+        this.userService.sentRequests = res.sentRequests;
         this.userService.refreshAvlRequests();
       });
 

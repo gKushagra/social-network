@@ -22,6 +22,8 @@ const Reset = mongoose.model("Reset");
 const Contact = mongoose.model("Contact");
 const Request = mongoose.model("Request");
 
+const domain = `http://localhost:4240`
+
 /**
  * This method checks if a user exists
  * and is verified and returns JWT to client.
@@ -151,8 +153,8 @@ const getResetLinkController = (req, res) => {
           sendEmail({
             to: user[0].email,
             subject: "Password Reset Link",
-            text: `http://localhost:4200/reset?token=${token}`,
-            html: `<p>Click on this <a href="http://localhost:4200/reset?token=${token}">link</a> to reset your password.`,
+            text: `${domain}/reset?token=${token}`,
+            html: `<p>Click on this <a href="${domain}/reset?token=${token}">link</a> to reset your password.`,
           });
         } catch (error) {
           return res.sendStatus(500);
@@ -235,11 +237,15 @@ const removeContact = (req, res) => {
  * @param {*} res HTTP Response
  */
 const getRequests = (req, res) => {
-  const requestToId = req.params.id;
-  Request.find({ toUserId: requestToId, status: 1 }, (err, requests) => {
+  const _id = req.params.id;
+  Request.find({ toUserId: _id, status: 1 }, (err, requests) => {
     if (err) return res.sendStatus(500);
 
-    return res.status(200).json({ requests: requests });
+    Request.find({ fromUserId: _id, status: 1 }, (err, sentRequests) => {
+      if (err) return res.sendStatus(500);
+
+      return res.status(200).json({ requests, sentRequests });
+    })
   });
 }
 
@@ -256,6 +262,7 @@ const addRequest = (req, res) => {
     toUserId: data.toUserId,
     status: 1
   });
+  request.addNewRequest();
   request.save((err, c) => {
     if (err) return res.sendStatus(500);
 
@@ -271,19 +278,27 @@ const addRequest = (req, res) => {
 const acceptRequest = (req, res) => {
   const data = req.body;
 
-  for (let i = 0; i < 2; i++) {
+  const contact1 = new Contact({
+    contactOwnerId: data.fromUserId,
+    contactUserId: data.toUserId,
+    contactUserEmail: data.toUserEmail
+  });
 
-    const contact = new Contact({
-      contactOwnerId: data[i].ownerId,
-      contactUserId: data[i].userId,
-      contactUserEmail: data[i].userEmail
-    });
-    contact.save((err, c) => {
-      if (err) return res.sendStatus(500);
-    });
-  }
+  const contact2 = new Contact({
+    contactOwnerId: data.toUserId,
+    contactUserId: data.fromUserId,
+    contactUserEmail: data.fromUserEmail
+  });
+  
+  contact1.save((err, c) => {
+    if (err) return res.sendStatus(500);
+  });
 
-  Contact.findOneAndUpdate({ requestId: req.params.id }, { status: 0 }, (err, c) => {
+  contact2.save((err, c) => {
+    if (err) return res.sendStatus(500);
+  });
+
+  Request.findOneAndUpdate({ requestId: data.requestId }, { status: 0 }, (err, c) => {
     if (err) return res.sendStatus(500);
 
     return res.status(200).json('contact added');
@@ -295,7 +310,7 @@ const acceptRequest = (req, res) => {
  * @param {*} req HTTP Request
  * @param {*} res HTTP Response
  */
-const setRequestInactive = (req, res) => {
+const cancelRequest = (req, res) => {
   const requestId = req.params.id;
   Contact.findOneAndUpdate({ requestId: requestId }, { status: 0 }, (err, c) => {
     if (err) return res.sendStatus(500);
@@ -316,5 +331,5 @@ module.exports = {
   getRequests,
   addRequest,
   acceptRequest,
-  setRequestInactive,
+  cancelRequest,
 };

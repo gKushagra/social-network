@@ -11,7 +11,7 @@ const {
     getUsers,
     getRequests,
     addRequest,
-    setRequestInactive,
+    cancelRequest,
     acceptRequest,
 } = require('./controllers');
 
@@ -41,8 +41,8 @@ router.get('/requests/:id', getRequests);
 
 router.post('/requests', addRequest);
 
-router.post('/requests/:id', acceptRequest);
+router.put('/requests', acceptRequest);
 
-router.put('/requests/:id', setRequestInactive);
+router.put('/requests/:id', cancelRequest);
 
 module.exports = router;
