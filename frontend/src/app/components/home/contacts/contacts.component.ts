@@ -207,7 +207,7 @@ export class ContactsComponent implements OnInit {
     let activeUser = this.activeUsers.filter(user => {
       return user.id === id
     });
-    console.log(activeUser);
+    // console.log(activeUser);
     if (activeUser.length > 0) return true;
     else return false;
   }

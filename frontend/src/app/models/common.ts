@@ -15,3 +15,13 @@ export interface Request {
     toUserId: string,
     status: boolean
 }
+
+export interface Post {
+    postId: string,
+    postOwnerId: string,
+    postHtmlContent: string,
+    postFileLink: string,
+    postExternalLink: string,
+    postDate: Date,
+    postComments: any
+}

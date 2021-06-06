@@ -1,4 +1,63 @@
-<mat-card>
-    Posts
-    <button (click)="openNewPostDialog()" color="primary" type="button" mat-stroked-button>New Post</button>
-</mat-card>
+<div fxLayout="column" style="width: 100%; height: 100vh; overflow: auto !important;">
+    <div fxLayout="row" style="width: 100%; margin-top: 21px;">
+        <div fxFlex></div>
+        <button (click)="openNewPostDialog()" color="primary" type="button" mat-stroked-button>New Post</button>
+        <div fxFlex="5"></div>
+    </div>
+    <div *ngFor="let post of posts" fxLayout="row" style="width: 100%; margin-top: 16px;">
+        <div fxFlex="5"></div>
+        <mat-card style="margin: 0 !important;" fxFlex="90">
+            <div fxLayout="column" style="width: 100% !important;">
+                <!-- post by and options if post owner -->
+                <div fxLayout="row" fxLayoutAlign="start center" style="margin-top: 16px;">
+                    <div class="av">
+                        {{ getUserEmail(post.postOwnerId).split('@')[0]|slice:0:1 }}
+                    </div>
+                    <div fxFlex="1"></div>
+                    <div class="mat-title" style="margin: 0 !important;">
+                        {{ getUserEmail(post.postOwnerId).split('@')[0] }}
+                    </div>
+                    <div fxFlex="2"></div>
+                    <small>{{ post.postDate|date }}</small>
+                    <div fxFlex></div>
+                    <button matTooltip="Edit" (click)="editPost(post)" *ngIf="checkOwner(post.postOwnerId)"
+                        mat-icon-button>
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button matTooltip="Delete" (click)="deletePost(post.postId)" *ngIf="checkOwner(post.postOwnerId)"
+                        mat-icon-button>
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+
+                <!-- post html content -->
+                <div fxLayout="row" style="width: 100%; margin-top: 16px;">
+                    <p [innerHtml]="post.postHtmlContent"></p>
+                </div>
+
+                <!-- show uploaded file/external link -->
+                <div fxLayout="row" [id]="post.postId" style="width: 100%; margin-top: 16px;">
+                    {{ post.postFileLink ? showFiles(post):'' }}
+                    {{ post.postExternalLink ? showLink(post):'' }}
+                </div>
+
+                <!-- post comments -->
+                <div fxLayout="row" style="width: 100%; margin-top: 16px;"></div>
+
+                <!-- add comment -->
+                <div fxLayout="row" style="width: 100%; margin-top: 16px;">
+                    <mat-form-field fxFlex>
+                        <textarea placeholder="Your comment" rows="2" [formControl]="comment" matInput></textarea>
+                    </mat-form-field>
+                    <div fxFlex="2"></div>
+                    <div>
+                        <button (click)="addComment()" mat-stroked-button>
+                            Comment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+        <div fxFlex="5"></div>
+    </div>
+</div>

@@ -2,6 +2,9 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../helpers/nodemailer");
+const formidable = require('formidable');
+const fs = require('fs');
+const path = require('path');
 
 mongoose.connect(process.env.mongodbUrl, {
   useNewUrlParser: true,
@@ -21,8 +24,11 @@ const User = mongoose.model("User");
 const Reset = mongoose.model("Reset");
 const Contact = mongoose.model("Contact");
 const Request = mongoose.model("Request");
+const Post = mongoose.model("Post");
 
 const domain = `http://localhost:4240`
+
+console.log(path.join(__dirname + process.env.fileDir))
 
 /**
  * This method checks if a user exists
@@ -289,7 +295,7 @@ const acceptRequest = (req, res) => {
     contactUserId: data.fromUserId,
     contactUserEmail: data.fromUserEmail
   });
-  
+
   contact1.save((err, c) => {
     if (err) return res.sendStatus(500);
   });
@@ -312,11 +318,123 @@ const acceptRequest = (req, res) => {
  */
 const cancelRequest = (req, res) => {
   const requestId = req.params.id;
-  Contact.findOneAndUpdate({ requestId: requestId }, { status: 0 }, (err, c) => {
+  Request.findOneAndUpdate({ requestId: requestId }, { status: 0 }, (err, c) => {
     if (err) return res.sendStatus(500);
 
     return res.status(200).json('request status set inactive');
   });
+}
+
+/**
+ * get all the posts
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const getPosts = (req, res) => {
+  Post.find((err, posts) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(200).json({ posts: posts });
+  });
+}
+
+/**
+ * add a new post
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const addNewPost = (req, res) => {
+  let post = req.body;
+
+  let newPost = new Post({
+    postId: null,
+    postOwnerId: post.postOwnerId,
+    postHtmlContent: post.postHtmlContent,
+    postFileLink: post.postFileLink,
+    postExternalLink: post.postExternalLink,
+    postDate: null,
+    postComments: null
+  });
+
+  newPost.addNewPost();
+
+  newPost.save((err, p) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(201).json({ post: newPost });
+  });
+}
+
+/**
+ * update a post
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const editPost = (req, res) => {
+  let updatedPost = req.body;
+
+  Post.findOneAndUpdate(
+    { postId: updatedPost.postId },
+    {
+      postHtmlContent: updatedPost.postHtmlContent,
+      postFileLink: updatedPost.postFileLink,
+      postExternalLink: updatedPost.postExternalLink,
+      postComments: updatedPost.postComments
+    },
+    (err, post) => {
+      if (err) return res.sendStatus(500);
+
+      return res.status(200).json({ post: updatedPost });
+    });
+}
+
+/**
+ * delete a post
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const removePost = (req, res) => {
+  let postId = req.params.id;
+
+  Post.findOneAndDelete({ postId: postId }, (err, post) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(200).json({ postId: postId });
+  });
+}
+
+/**
+ * get all the posts
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const uploadFile = (req, res) => {
+  const fileData = formidable({
+    multiples: false,
+    uploadDir: path.join(__dirname + process.env.fileDir),
+    keepExtensions: true,
+  });
+
+  fileData.parse(req, (err, fields, files) => {
+    if (err) return res.sendStatus(500);
+
+    // console.log(files);
+
+    return res.status(201).json({
+      filename: files['file']['path'].split('/')[files['file']['path'].split('/').length - 1]
+    });
+  });
+}
+
+/**
+ * get all the posts
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const getFile = (req, res) => {
+  const filename = req.params.filename;
+
+  res.sendFile(path.join(__dirname + process.env.fileDir + filename));
 }
 
 module.exports = {
@@ -332,4 +450,10 @@ module.exports = {
   addRequest,
   acceptRequest,
   cancelRequest,
+  getPosts,
+  addNewPost,
+  editPost,
+  removePost,
+  uploadFile,
+  getFile,
 };

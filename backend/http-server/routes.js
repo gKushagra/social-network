@@ -13,6 +13,12 @@ const {
     addRequest,
     cancelRequest,
     acceptRequest,
+    getPosts,
+    addNewPost,
+    editPost,
+    removePost,
+    getFile,
+    uploadFile,
 } = require('./controllers');
 
 const router = express.Router();
@@ -44,5 +50,19 @@ router.post('/requests', addRequest);
 router.put('/requests', acceptRequest);
 
 router.put('/requests/:id', cancelRequest);
+
+// posts
+router.get('/posts', getPosts);
+
+router.post('/posts', addNewPost);
+
+router.put('/posts', editPost);
+
+router.delete('/posts/:id', removePost);
+
+// files
+router.get('/files/:filename', getFile);
+
+router.post('/files', uploadFile);
 
 module.exports = router;

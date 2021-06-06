@@ -13,6 +13,9 @@ import { NewPostComponent } from './home/new-post/new-post.component';
 import { ContactsComponent } from './home/contacts/contacts.component';
 import { ChatComponent } from './home/chat/chat.component';
 import { CommonModule } from "@angular/common";
+import { QuillModule } from "ngx-quill";
+import { ExtLinkComponent } from './home/ext-link/ext-link.component';
+import { SafePipe } from "../pipes/safe.pipe";
 
 @NgModule({
     declarations: [
@@ -24,7 +27,9 @@ import { CommonModule } from "@angular/common";
         PostsComponent,
         NewPostComponent,
         ContactsComponent,
-        ChatComponent
+        ChatComponent,
+        ExtLinkComponent,
+        SafePipe,
     ],
     imports: [
         CommonModule,
@@ -32,6 +37,7 @@ import { CommonModule } from "@angular/common";
         FlexLayoutModule,
         HttpClientModule,
         ReactiveFormsModule,
+        QuillModule.forRoot(),
     ],
     exports: []
 })

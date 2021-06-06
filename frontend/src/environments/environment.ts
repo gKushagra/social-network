@@ -8,6 +8,8 @@ export const environment = {
   usersUrl: "http://localhost:4050/users",
   contactsUrl: "http://localhost:4050/contacts",
   requestUrl: "http://localhost:4050/requests",
+  postsUrl: "http://localhost:4050/posts",
+  filesUrl: "http://localhost:4050/files",
   socketUrl: 'ws://localhost:4051',
   reconnectInterval: 2000
 };

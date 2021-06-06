@@ -65,3 +65,22 @@ RequestSchema.methods.addNewRequest = function () {
 }
 
 mongoose.model("Request", RequestSchema);
+
+const PostSchema = new Schema({
+  postId: String,
+  postOwnerId: String,
+  postHtmlContent: String,
+  postFileLink: String,
+  postExternalLink: String,
+  postDate: Date,
+  postComments: JSON
+});
+
+PostSchema.methods.addNewPost = function () {
+  this.postId = uuid();
+  this.postDate = new Date();
+  this.postComments = {}
+}
+
+mongoose.model("Post", PostSchema);
+

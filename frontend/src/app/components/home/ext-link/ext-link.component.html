@@ -1,0 +1,11 @@
+<div fxLayout="column" style="width: 100%; height: 100%;">
+    <div fxLayout="row" style="width: 100%;">
+        <button mat-icon-button (click)="dialogRef.close()">
+            <mat-icon>close</mat-icon>
+        </button>
+        <div fxFlex></div>
+    </div>
+    <div fxLayout="row" style="width: 100%; height: 95vh !important; overflow: auto;">
+        <iframe [src]="url | safe:'resourceUrl'" frameborder="0"></iframe>
+    </div>
+</div>

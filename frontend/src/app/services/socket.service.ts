@@ -27,7 +27,7 @@ export class SocketService {
 
     // new message from server
     this.ws.onmessage = (event) => {
-      console.log(JSON.parse(event.data));
+      // console.log(JSON.parse(event.data));
       this.newMessage.next(JSON.parse(event.data));
     }
 
