@@ -73,13 +73,13 @@ const PostSchema = new Schema({
   postFileLink: String,
   postExternalLink: String,
   postDate: Date,
-  postComments: JSON
+  postComments: []
 });
 
 PostSchema.methods.addNewPost = function () {
   this.postId = uuid();
   this.postDate = new Date();
-  this.postComments = {}
+  this.postComments = []
 }
 
 mongoose.model("Post", PostSchema);

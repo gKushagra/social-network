@@ -41,8 +41,22 @@
                     {{ post.postExternalLink ? showLink(post):'' }}
                 </div>
 
+                <div fxLayout="row" style="width: 100%; margin-top: 16px;">
+                    <mat-divider></mat-divider>
+                </div>
+
                 <!-- post comments -->
-                <div fxLayout="row" style="width: 100%; margin-top: 16px;"></div>
+                <div *ngIf="post.postComments.length > 0" fxLayout="column" style="width: 100%; margin-top: 16px;">
+                    <div *ngFor="let comment of post.postComments" fxLayout="row" style="width: 100%;">
+                        <mat-icon>comment</mat-icon>
+                        <div fxFlex="1"></div>
+                        <div>{{ getUserEmail(comment.commentBy).split('@')[0] |uppercase}}</div>
+                        <div fxFlex="1"></div>
+                        <small>{{ comment.commentDate |date}}</small>
+                        <div fxFlex="4"></div>
+                        <div>{{ comment.commentText }}</div>
+                    </div>
+                </div>
 
                 <!-- add comment -->
                 <div fxLayout="row" style="width: 100%; margin-top: 16px;">
@@ -51,7 +65,7 @@
                     </mat-form-field>
                     <div fxFlex="2"></div>
                     <div>
-                        <button (click)="addComment()" mat-stroked-button>
+                        <button (click)="addComment(post)" mat-stroked-button>
                             Comment
                         </button>
                     </div>

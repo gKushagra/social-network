@@ -61,10 +61,13 @@ export class NewPostComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (this.data) {
-      if (this.data.postFileLink) this.showFiles(this.data);
-      if (this.data.postExternalLink) this.showLink(this.data);
-    }
+    setTimeout(() => {
+      if (this.data) {
+        this.post = this.data;
+        if (this.post.postFileLink) this.showFiles(this.data);
+        if (this.post.postExternalLink) this.showLink(this.data);
+      }
+    }, 2000);
   }
 
   // method to save a new post
@@ -123,78 +126,6 @@ export class NewPostComponent implements OnInit {
         if (error.status === 500) console.log("Server Error");
       }, () => {
         this.showFiles(this.post);
-        // console.log(this.post.postFileLink);
-        // let ext = this.post.postFileLink.split('.')[1];
-        // if (this.imgTypes.indexOf(ext) >= 0) {
-        //   let imgEl = document.createElement('img');
-        //   imgEl.src = this.post.postFileLink;
-        //   // remove btn
-        //   let delBtn = document.createElement('button');
-        //   delBtn.classList.add('mat-button');
-        //   delBtn.addEventListener('click', () => {
-        //     this.post.postFileLink = null;
-        //     this.showMediaEl.nativeElement.removeChild(imgEl);
-        //     this.showMediaEl.nativeElement.removeChild(delBtn);
-        //   });
-        //   delBtn.innerText = 'Remove';
-        //   this.showMediaEl.nativeElement.appendChild(delBtn);
-
-        //   this.showMediaEl.nativeElement.appendChild(imgEl);
-        // } else if (this.vidTypes.indexOf(ext) >= 0) {
-        //   let vidEl = document.createElement('video');
-        //   vidEl.controls = true;
-        //   vidEl.src = this.post.postFileLink;
-
-        //   // remove btn
-        //   let delBtn = document.createElement('button');
-        //   delBtn.classList.add('mat-button');
-        //   delBtn.addEventListener('click', () => {
-        //     this.post.postFileLink = null;
-        //     this.showMediaEl.nativeElement.removeChild(vidEl);
-        //     this.showMediaEl.nativeElement.removeChild(delBtn);
-        //   });
-        //   delBtn.innerText = 'Remove';
-        //   this.showMediaEl.nativeElement.appendChild(delBtn);
-
-        //   this.showMediaEl.nativeElement.appendChild(vidEl);
-        // } else if (this.audTypes.indexOf(ext) >= 0) {
-        //   let audEl = document.createElement('audio');
-        //   audEl.src = this.post.postFileLink;
-        //   audEl.controls = true;
-
-        //   // remove btn
-        //   let delBtn = document.createElement('button');
-        //   delBtn.classList.add('mat-button');
-        //   delBtn.addEventListener('click', () => {
-        //     this.post.postFileLink = null;
-        //     this.showMediaEl.nativeElement.removeChild(audEl);
-        //     this.showMediaEl.nativeElement.removeChild(delBtn);
-        //   });
-        //   delBtn.innerText = 'Remove';
-        //   this.showMediaEl.nativeElement.appendChild(delBtn);
-
-        //   this.showMediaEl.nativeElement.appendChild(audEl);
-        // } else {
-        //   let fileEl = document.createElement('button');
-        //   fileEl.addEventListener('click', () => {
-        //     window.open(this.post.postFileLink);
-        //   });
-        //   fileEl.innerText = 'Download ' + this.post.postFileLink.split('/')[this.post.postFileLink.split('/').length - 1].split('.')[1];
-        //   fileEl.classList.add('mat-stroked-button');
-
-        //   // remove btn
-        //   let delBtn = document.createElement('button');
-        //   delBtn.classList.add('mat-button');
-        //   delBtn.addEventListener('click', () => {
-        //     this.post.postFileLink = null;
-        //     this.showMediaEl.nativeElement.removeChild(fileEl);
-        //     this.showMediaEl.nativeElement.removeChild(delBtn);
-        //   });
-        //   delBtn.innerText = 'Remove';
-        //   this.showMediaEl.nativeElement.appendChild(delBtn);
-
-        //   this.showMediaEl.nativeElement.appendChild(fileEl);
-        // }
       });
   }
 
@@ -206,42 +137,21 @@ export class NewPostComponent implements OnInit {
   insertLink(): void {
     this.post.postExternalLink = this.externalLink.value;
     this.showLink(this.post);
-    // let linkEl = document.createElement('button');
-    // let newTabLinkEl = document.createElement('a');
-    // newTabLinkEl.href = this.post.postExternalLink;
-    // newTabLinkEl.innerHTML = 'Open in new tab';
-    // newTabLinkEl.target = '_blank';
-    // linkEl.addEventListener('click', () => {
-    //   console.log(this.post.postExternalLink);
-    //   this.postsService.openExternalLink(this.post.postExternalLink);
-    // });
-    // linkEl.innerText = 'Open Link';
-    // linkEl.classList.add('mat-stroked-button');
-    // newTabLinkEl.classList.add('mat-button');
-
-    // // remove btn
-    // let delBtn = document.createElement('button');
-    // delBtn.classList.add('mat-button');
-    // delBtn.addEventListener('click', () => {
-    //   this.post.postExternalLink = null;
-    //   this.showMediaEl.nativeElement.removeChild(linkEl);
-    //   this.showMediaEl.nativeElement.removeChild(newTabLinkEl);
-    //   this.showMediaEl.nativeElement.removeChild(delBtn);
-    // });
-    // delBtn.innerText = 'Remove';
-    // this.showMediaEl.nativeElement.appendChild(delBtn);
-
-    // this.showMediaEl.nativeElement.appendChild(linkEl);
-    // this.showMediaEl.nativeElement.appendChild(newTabLinkEl);
-    // this.showExtLinkInput = false;
   }
 
+  /**
+   * helper method to show media
+   * @param data post
+   */
   showFiles(data: Post): void {
     console.log(data.postFileLink);
     let ext = data.postFileLink.split('.')[1];
     if (this.postsService.imgTypes.indexOf(ext) >= 0) {
       let imgEl = document.createElement('img');
+      imgEl.width = 560;
+      imgEl.height = 315;
       imgEl.src = data.postFileLink;
+
       // remove btn
       let delBtn = document.createElement('button');
       delBtn.classList.add('mat-button');
@@ -257,8 +167,10 @@ export class NewPostComponent implements OnInit {
     } else if (this.postsService.vidTypes.indexOf(ext) >= 0) {
       let vidEl = document.createElement('video');
       vidEl.controls = true;
+      vidEl.width = 560;
+      vidEl.height = 315;
       vidEl.src = data.postFileLink;
-
+      
       // remove btn
       let delBtn = document.createElement('button');
       delBtn.classList.add('mat-button');
@@ -311,6 +223,10 @@ export class NewPostComponent implements OnInit {
     }
   }
 
+  /**
+   * helper method to show external link
+   * @param data post
+   */
   showLink(data: Post): void {
     let linkEl = document.createElement('button');
     let newTabLinkEl = document.createElement('a');
