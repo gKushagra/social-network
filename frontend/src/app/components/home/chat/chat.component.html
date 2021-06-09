@@ -1,5 +1,5 @@
 <div style="width: 100%; height: 100%;">
-    <mat-card *ngIf="isActive" fxFlex>
+    <mat-card *ngIf="chatWindowActive" fxFlex>
         <div fxLayout="column" fxLayoutAlign="start" style="width: 100%; height: 100%;">
             <div fxLayout="row" fxLayoutAlign="start center" style="margin-bottom: 16px !important;">
                 <div fxFlex="1"></div>
@@ -21,7 +21,14 @@
                     </button>
                 </mat-menu>
                 <div fxFlex></div>
-                <div class="mat-headline" style="margin-bottom: 0 !important;">{{ user }}</div>
+                <div class="row" fxLayoutAlign="start start">
+                    <div class="mat-headline" style="margin-bottom: 0;">
+                        {{ getUserEmail(peerId).split('@')[0] }}
+                    </div>
+                    <small [ngClass]="isActive(peerId) ? 'active-badge':'inactive-badge'">
+                        {{ isActive(peerId) ? 'available':'away' }}
+                    </small>
+                </div>
                 <div fxFlex="2"></div>
                 <button (click)="closeConversation()" mat-icon-button>
                     <mat-icon>close</mat-icon>
@@ -30,12 +37,18 @@
             <div>
                 <mat-divider></mat-divider>
             </div>
-            <mat-list style="overflow: auto;" fxFlex>
-                <mat-list-item *ngFor="let message of conversation">
-                    {{ message }}
-                    <mat-divider></mat-divider>
-                </mat-list-item>
-            </mat-list>
+            <div id="conversation-thread" style="overflow: auto;" fxFlex>
+                <div *ngFor="let message of messages">
+                    <div fxLayout="row" style="width: 100%; border-bottom: 1px solid gainsboro; padding: 8px 4px 8px 4px;">
+                        <div style="color: #0D47A1;" fxLayout="column">
+                            <small>{{ getUserEmail(message.fromUserId).split('@')[0] |uppercase}}</small>
+                            <small>{{ message.date |date:'short'}}</small>
+                        </div>
+                        <div fxFlex="10"></div>
+                        <div>{{ message.text }}</div>
+                    </div>
+                </div>
+            </div>
             <mat-form-field appearance="outline">
                 <textarea (keydown)="newText($event)" [formControl]="textMessage" fxFlex
                     placeholder="Type your message..." cols="30" rows="5" matInput></textarea>

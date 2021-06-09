@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, startWith } from "rxjs/operators";
 import { Contact, Request, User } from 'src/app/models/common';
@@ -15,37 +14,43 @@ import { ChatService } from "../../../services/chat.service";
 })
 export class ContactsComponent implements OnInit {
 
-  myControl = new FormControl();
-  options: User[] = [];
-  filteredOptions: Observable<User[]>;
-  contacts: Contact[] = [];
-  activeUsers: any = [];
-  requests: Request[] = [];
-  sentRequests: Request[] = [];
-  currUser: User;
+  myControl = new FormControl();        // global search control
+  options: User[] = [];                 // global users list
+  filteredOptions: Observable<User[]>;  // filtered global users list
+  contacts: Contact[] = [];             // user contacts
+  activeUsers: any = [];                // contacts active
+  requests: Request[] = [];             // user connection request received
+  sentRequests: Request[] = [];         // user connection request received      
+  currUser: User;                       // local curr user
 
   constructor(
     private chatService: ChatService,
     private userService: UserService,
-    private router: Router,
     private socketService: SocketService,
   ) { }
 
   ngOnInit(): void {
-
+    // global user search
     this.options = this.userService.users;
-    this.options = this.options.filter(user => {
-      return user.id !== this.userService.currUser.id
-    });
-    console.log(this.options);
 
+    // get contacts for user
     this.contacts = this.userService.contacts;
     console.log(this.contacts);
 
+    // remove curr user and contacts
+    this.options = this.options.filter(user => {
+      return user.id !== this.userService.currUser.id ||
+        this.userService.contacts.findIndex(_c => _c.contactUserId === user.id) >= 0
+    });
+    // console.log(this.options);
+
+    // set local curr user
     this.currUser = this.userService.currUser;
 
+    // get requests received and sent
     this.requests = this.userService.requests;
 
+    // subscribe to any new online user available
     this.userService.observeAvlUsers.subscribe(avl => {
       if (avl) {
         this.options = this.userService.users;
@@ -57,6 +62,7 @@ export class ContactsComponent implements OnInit {
       }
     });
 
+    // subscribe to any new contacts available
     this.userService.observeAvlContacts.subscribe(avl => {
       if (avl) {
         this.contacts = this.userService.contacts;
@@ -64,6 +70,7 @@ export class ContactsComponent implements OnInit {
       }
     });
 
+    // subscribe to any new requests available
     this.userService.observeAvlRequests.subscribe(avl => {
       if (avl) {
         this.requests = this.userService.requests;
@@ -72,28 +79,44 @@ export class ContactsComponent implements OnInit {
       }
     });
 
+    // filter for global user autocomplete
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
       map(value => this._filter(value))
     );
 
+    // subscribe to any new message available
     this.socketService.observeNewMessage.subscribe(msg => {
-      if (msg.type === "active-users") {
+      if ('type' in msg && msg['type'] === "active-users") {
         this.activeUsers = msg.data;
+        this.userService.activeUsers = this.activeUsers;
       }
     });
   }
 
+  /**
+   * global search autocomplete filter
+   * @param value what user types
+   * @returns array of users with matching names
+   */
   private _filter(value: string): User[] {
     const filterValue = value.toLowerCase();
 
     return this.options.filter(option => option.email.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  public selectContact(_user: any): void {
-    this.chatService.changeCurrUser(_user);
+  /**
+   * refresh chat when a contact is clicked
+   * @param _user contact
+   */
+  public selectContact(contact: any): void {
+    this.chatService.changeCurrContact(contact);
   }
 
+  /**
+   * add contact [DEPRECATED]
+   * @param _user user
+   */
   public addContact(_user: any): void {
     this.userService.addContact({
       ownerId: this.userService.currUser.id,
@@ -102,21 +125,17 @@ export class ContactsComponent implements OnInit {
     }).subscribe((res: any) => {
       console.log(res);
     }, (error) => {
+      // server error
       if (error.status === 500) console.log("Server Error");
     }, () => {
-      this.userService.getUsers()
-        .subscribe((res: any) => {
-          this.userService.users = res.users;
-          this.userService.refreshAvlUsers();
-        });
-      this.userService.getContacts()
-        .subscribe((res: any) => {
-          this.userService.contacts = res.contacts;
-          this.userService.refreshAvlContacts();
-        });
+      this.getUsersAndContacts();
     });
   }
 
+  /**
+   * remove existing contact
+   * @param _user contact
+   */
   public removeContact(_user: any): void {
     this.userService.removeContact(_user.contactUserId)
       .subscribe((res: any) => {
@@ -124,19 +143,14 @@ export class ContactsComponent implements OnInit {
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
       }, () => {
-        this.userService.getUsers()
-          .subscribe((res: any) => {
-            this.userService.users = res.users;
-            this.userService.refreshAvlUsers();
-          });
-        this.userService.getContacts()
-          .subscribe((res: any) => {
-            this.userService.contacts = res.contacts;
-            this.userService.refreshAvlContacts();
-          });
+        this.getUsersAndContacts();
       });
   }
 
+  /**
+   * send a new connection request
+   * @param _user user
+   */
   addRequest(_user: any): void {
     this.userService.addRequest({
       fromUserId: this.userService.currUser.id,
@@ -146,12 +160,7 @@ export class ContactsComponent implements OnInit {
     }, (error) => {
       if (error.status === 500) console.log("Server Error");
     }, () => {
-      this.userService.getRequests()
-        .subscribe((res: any) => {
-          this.userService.requests = res.requests;
-          this.userService.sentRequests = res.sentRequests;
-          this.userService.refreshAvlRequests();
-        });
+      this.getRequests();
     });
   }
 
@@ -172,15 +181,14 @@ export class ContactsComponent implements OnInit {
     }, (error) => {
       if (error.status === 500) console.log("Server Error");
     }, () => {
-      this.userService.getRequests()
-        .subscribe((res: any) => {
-          this.userService.requests = res.requests;
-          this.userService.sentRequests = res.sentRequests;
-          this.userService.refreshAvlRequests();
-        });
+      this.getRequests();
     });
   }
 
+  /**
+   * cancel a pending request
+   * @param request 
+   */
   cancelRequest(request: Request): void {
     this.userService.declineRequest(request.requestId)
       .subscribe((res: any) => {
@@ -188,30 +196,65 @@ export class ContactsComponent implements OnInit {
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
       }, () => {
-        this.userService.getRequests()
-          .subscribe((res: any) => {
-            this.userService.requests = res.requests;
-            this.userService.sentRequests = res.sentRequests;
-            this.userService.refreshAvlRequests();
-          });
+        this.getRequests();
       });
   }
 
+  /**
+   * get updated list of global users
+   * and contacts
+   */
+  getUsersAndContacts(): void {
+    this.userService.getUsers()
+      .subscribe((res: any) => {
+        this.userService.users = res.users;
+        this.userService.refreshAvlUsers();
+      });
+    this.userService.getContacts()
+      .subscribe((res: any) => {
+        this.userService.contacts = res.contacts;
+        this.userService.refreshAvlContacts();
+      });
+  }
+
+  /**
+   * get updated list of requests
+   */
+  getRequests(): void {
+    this.userService.getRequests()
+      .subscribe((res: any) => {
+        this.userService.requests = res.requests;
+        this.userService.sentRequests = res.sentRequests;
+        this.userService.refreshAvlRequests();
+      });
+  }
+
+  /**
+   * @param id user id
+   * @returns users email
+   */
   getUserEmail(id: any): any {
     return this.userService.users.filter(user => {
       return user.id === id
     })[0].email;
   }
 
+  /**
+   * @param id user id
+   * @returns user active or not boolean
+   */
   isActive(id: any): boolean {
-    let activeUser = this.activeUsers.filter(user => {
-      return user.id === id
+    let activeUser = this.activeUsers.filter(userId => {
+      return userId === id
     });
     // console.log(activeUser);
     if (activeUser.length > 0) return true;
     else return false;
   }
 
+  /**
+   * logout
+   */
   public tryLogout(): void {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('_user');

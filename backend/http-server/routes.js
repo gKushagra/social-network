@@ -19,6 +19,9 @@ const {
     removePost,
     getFile,
     uploadFile,
+    getConversations,
+    addConversation,
+    updateConversation,
 } = require('./controllers');
 
 const router = express.Router();
@@ -64,5 +67,12 @@ router.delete('/posts/:id', removePost);
 router.get('/files/:filename', getFile);
 
 router.post('/files', uploadFile);
+
+// conversations
+router.get('/conversations/:id', getConversations);
+
+router.post('/conversations', addConversation);
+
+router.put('/conversations', updateConversation);
 
 module.exports = router;

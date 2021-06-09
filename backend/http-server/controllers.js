@@ -25,6 +25,7 @@ const Reset = mongoose.model("Reset");
 const Contact = mongoose.model("Contact");
 const Request = mongoose.model("Request");
 const Post = mongoose.model("Post");
+const Conversation = mongoose.model("Conversation");
 
 const domain = `http://localhost:4240`
 
@@ -437,6 +438,64 @@ const getFile = (req, res) => {
   res.sendFile(path.join(__dirname + process.env.fileDir + filename));
 }
 
+/**
+ * get all the conversations for id
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const getConversations = (req, res) => {
+  let userId = req.params.id;
+
+  Conversation.find((err, conversations) => {
+    if (err) return res.sendStatus(500);
+
+    let userConversations = conversations.filter(_c => {
+      return _c.users.indexOf(userId) >= 0
+    });
+
+    return res.status(200).json({ conversations: userConversations });
+  });
+}
+
+/**
+ * add new conversation
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const addConversation = (req, res) => {
+  let data = req.body;
+
+  let newConversation = new Conversation({
+    conversationId: null,
+    users: data.users,
+    messages: data.messages
+  });
+
+  newConversation.addNewConv();
+
+  newConversation.save((err, conv) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(201).json({ conversation: newConversation });
+  });
+}
+
+/**
+ * update conversation
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const updateConversation = (req, res) => {
+  Conversation.findOneAndUpdate(
+    { conversationId: req.body.conversationId },
+    { messages: req.body.messages },
+    (err, conv) => {
+      if (err) return res.sendStatus(500);
+
+      return res.status(200).json({ conversation: req.body });
+    });
+}
+
 module.exports = {
   loginController,
   signupController,
@@ -456,4 +515,7 @@ module.exports = {
   removePost,
   uploadFile,
   getFile,
+  getConversations,
+  addConversation,
+  updateConversation,
 };

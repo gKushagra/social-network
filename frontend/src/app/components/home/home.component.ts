@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
 import { SocketService } from "src/app/services/socket.service";
 import { environment } from 'src/environments/environment';
+import { ChatService } from 'src/app/services/chat.service';
 
 @Component({
   selector: 'app-home',
@@ -17,6 +18,7 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private socketService: SocketService,
+    private chatService: ChatService,
   ) { }
 
   ngOnInit(): void {
@@ -48,6 +50,8 @@ export class HomeComponent implements OnInit {
         this.userService.refreshAvlRequests();
       });
 
+    this.chatService.getConversations();
+
     this.connectToWs();
   }
 
@@ -55,8 +59,8 @@ export class HomeComponent implements OnInit {
     this.socketService.connect();
     setTimeout(() => {
       this.socketService.sendMessage({
-        type: "authenticate",
-        data: this.userService.currUser
+        type: "authentication",
+        data: this.userService.currUser.id
       });
     }, 2000);
   }

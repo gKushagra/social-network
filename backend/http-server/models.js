@@ -84,3 +84,18 @@ PostSchema.methods.addNewPost = function () {
 
 mongoose.model("Post", PostSchema);
 
+const ConversationSchema = new Schema({
+  conversationId: String,
+  users: [],
+  messages: []
+});
+
+ConversationSchema.methods.addNewConv = function () {
+  this.conversationId = uuid();
+}
+
+mongoose.model("Conversation", ConversationSchema);
+
+
+
+

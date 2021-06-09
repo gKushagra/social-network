@@ -25,3 +25,19 @@ export interface Post {
     postDate: Date,
     postComments: any
 }
+
+export interface Conversation {
+    conversationId: string,
+    users: string[],
+    messages: Message[]
+}
+
+export interface Message {
+    messageId: string,
+    fromUserId: string,
+    toUserId: string,
+    date: Date,
+    text: string,
+    fileLink: string,
+    externalLink: string
+}

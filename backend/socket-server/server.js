@@ -1,17 +1,10 @@
-const { v4: uuid } = require('uuid');
 const WebSocket = require('ws');
-const { Store } = require('./store');
 
 const wss = new WebSocket.Server({ port: 4051 });
-
-let users = new Store();
 
 wss.on('connection', function connection(ws) {
 
     console.log('client connected');
-
-    // assign uuid to connection
-    // ws["_id"] = uuid();
 
     // wss.clients.forEach(client => {
     //     console.log(client._id);
@@ -22,76 +15,61 @@ wss.on('connection', function connection(ws) {
 
     // send active users list every 5 seconds
     setInterval(() => {
+        let activeUsers = [];
+
+        wss.clients.forEach(function each(client) {
+            activeUsers.push(client['_id']);
+        });
+
         wss.clients.forEach(function each(client) {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({ type: "active-users", data: users.activeUsers }));
+                client.send(JSON.stringify({
+                    type: "active-users",
+                    data: activeUsers
+                }));
             }
         });
     }, 5000);
 
+    // relay message
     ws.on('message', function incoming(data) {
         console.log('received: %s', JSON.parse(data));
         let message = JSON.parse(data);
-        console.log(message);
-        switch (message.type) {
-            case "authenticate":
-                ws["_id"] = message.data.id;
-                users.addActiveUser({ id: message.data.id, email: message.data.email });
-                wss.clients.forEach(client => {
-                    console.log(client._id);
-                    if (ws["_id"] === client._id) {
-                        client.send(JSON.stringify({ type: "", msg: client._id }));
-                    }
-                });
-                break;
-            case "msg-text":
-                wss.clients.forEach(client => {
-                    console.log(client._id);
-                    if (message.data.peerId === client._id) {
-                        client.send(JSON.stringify({
-                            type: "msg-text",
-                            text: message.data.text,
-                            id: message.data.id,
-                            peerId: message.data.peerId
-                        }));
-                    }
-                });
-                break;
-            case "msg-image":
-
-                break;
-            case "msg-video":
-
-                break;
-            case "msg-link":
-
-                break;
-            case "msg-file":
-
-                break;
-
-            default:
-                break;
+        if ('type' in message && message['type'] === "authentication") {
+            ws["_id"] = message.data;
+            wss.clients.forEach(client => {
+                console.log(client._id);
+                if (client._id === message.data) {
+                    client.send(JSON.stringify(message));
+                }
+            });
+        } else {
+            wss.clients.forEach(client => {
+                console.log(client._id);
+                if (message.toUserId === client._id) {
+                    client.send(JSON.stringify(message));
+                }
+            });
         }
-
-        // redirect to room
     });
 
+    // socket server error
     ws.on('error', function serverError(err) {
         wss.clients.forEach(client => {
             if (ws["_id"] === client._id) {
-                users.removeActiveUser(client._id);
                 client.close();
+                wss.clients.delete(client);
             }
         });
         console.log('error, connection closed', err);
     });
 
+    // close conn request from client
     ws.on('close', function connClose() {
         wss.clients.forEach(client => {
             if (ws["_id"] === client._id) {
-                users.removeActiveUser(client._id);
                 client.close();
+                wss.clients.delete(client);
             }
         });
         console.log('connection closed');

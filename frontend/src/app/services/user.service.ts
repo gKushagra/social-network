@@ -14,6 +14,7 @@ export class UserService {
   public contacts: Contact[] = [];
   public requests: Request[] = [];
   public sentRequests: Request[] = [];
+  public activeUsers: any[] = [];
 
   private availableUsers: Subject<boolean> = new Subject();
   public observeAvlUsers: Observable<boolean> = this.availableUsers.asObservable();
