@@ -15,3 +15,14 @@
 .inactive-badge {
   background-color: #ffccbc;
 }
+
+.preview-link {
+  border: 1px solid gainsboro;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.preview-link__info {
+  height: 64px !important;
+}

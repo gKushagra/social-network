@@ -1,0 +1,51 @@
+<div fxLayout="column" style="width: 100%; height: 100%">
+    <div fxLayout="row" style="width: 100%;">
+        <button mat-icon-button (click)="closeDialog()">
+            <mat-icon>close</mat-icon>
+        </button>
+        <div fxFlex></div>
+        <div class="mat-headline">Send Media</div>
+    </div>
+    <!-- upload files or insert link -->
+    <div fxLayout="row" style="width: 100%; margin-top: 16px;">
+        <div fxFlex></div>
+        <label *ngIf="!this.fileLink && !this.externalLink.value" matTooltip="Add Image" for="uploadInput"
+            class="upload-btn">
+            <mat-icon>image</mat-icon>
+        </label>
+        <label *ngIf="!this.fileLink && !this.externalLink.value" matTooltip="Add Video" for="uploadInput"
+            class="upload-btn">
+            <mat-icon>movie</mat-icon>
+        </label>
+        <label *ngIf="!this.fileLink && !this.externalLink.value" matTooltip="Add Audio" for="uploadInput"
+            class="upload-btn">
+            <mat-icon>audiotrack</mat-icon>
+        </label>
+        <label *ngIf="!this.fileLink && !this.externalLink.value" matTooltip="Add File" for="uploadInput"
+            class="upload-btn">
+            <mat-icon>insert_drive_file</mat-icon>
+        </label>
+        <input hidden type="file" id="uploadInput" (change)="uploadFile($event.target.files)">
+        <mat-icon *ngIf="!this.fileLink && !this.externalLink.value"
+            (click)="showExtLinkInput?showExtLinkInput=false:showExtLinkInput=true;" class="upload-btn"
+            matTooltip="Insert Link">link</mat-icon>
+    </div>
+    <!-- enter link url -->
+    <div fxLayout="row" style="width: 100%; margin-top: 16px;" *ngIf="showExtLinkInput">
+        <mat-form-field fxFlex>
+            <input type="url" [formControl]="externalLink" matInput>
+        </mat-form-field>
+        <div fxFlex="2"></div>
+        <div>
+            <button (click)="insertLink()" mat-stroked-button>Add Link</button>
+        </div>
+    </div>
+    <!-- show uploaded file/external link -->
+    <div fxLayout="row" style="width: 100%; margin-top: 16px;" #showMedia></div>
+    <!-- save post -->
+    <div fxLayout="row" style="width: 100%; margin-top: 16px;">
+        <button (click)="closeDialog()" *ngIf="this.fileLink || this.externalLink.value" mat-stroked-button>
+            Send
+        </button>
+    </div>
+</div>

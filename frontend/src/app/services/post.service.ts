@@ -41,6 +41,10 @@ export class PostService {
     let externalLinkDialog = this.dialog.open(ExtLinkComponent, dialogConfig);
   }
 
+  getLinkPreview(link: string): any {
+    return this.http.post(environment.linksUrl + '/preview', link);
+  }
+
   getPosts(): any {
     return this.http.get(environment.postsUrl);
   }

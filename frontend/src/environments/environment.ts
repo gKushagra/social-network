@@ -11,6 +11,7 @@ export const environment = {
   postsUrl: "http://localhost:4050/posts",
   filesUrl: "http://localhost:4050/files",
   conversationsUrl: "http://localhost:4050/conversations",
+  linksUrl: "http://localhost:4050/links",
   socketUrl: 'ws://localhost:4051',
   reconnectInterval: 2000
 };

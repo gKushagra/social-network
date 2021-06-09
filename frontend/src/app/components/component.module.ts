@@ -16,6 +16,7 @@ import { CommonModule } from "@angular/common";
 import { QuillModule } from "ngx-quill";
 import { ExtLinkComponent } from './home/ext-link/ext-link.component';
 import { SafePipe } from "../pipes/safe.pipe";
+import { SendMediaComponent } from './home/chat/send-media/send-media.component';
 
 @NgModule({
     declarations: [
@@ -30,6 +31,7 @@ import { SafePipe } from "../pipes/safe.pipe";
         ChatComponent,
         ExtLinkComponent,
         SafePipe,
+        SendMediaComponent,
     ],
     imports: [
         CommonModule,
