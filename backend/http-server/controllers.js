@@ -5,6 +5,7 @@ const { sendEmail } = require("../helpers/nodemailer");
 const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
+const linkPreviewGenerator = require("link-preview-generator");
 
 mongoose.connect(process.env.mongodbUrl, {
   useNewUrlParser: true,
@@ -496,6 +497,16 @@ const updateConversation = (req, res) => {
     });
 }
 
+const getLinkPreviewInfo = (req, res) => {
+  try {
+    const previewData = linkPreviewGenerator(req.body);
+    return res.status(200).json({ preview: previewData });
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
 module.exports = {
   loginController,
   signupController,
@@ -518,4 +529,5 @@ module.exports = {
   getConversations,
   addConversation,
   updateConversation,
+  getLinkPreviewInfo,
 };

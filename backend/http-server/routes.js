@@ -22,6 +22,7 @@ const {
     getConversations,
     addConversation,
     updateConversation,
+    getLinkPreviewInfo,
 } = require('./controllers');
 
 const router = express.Router();
@@ -74,5 +75,8 @@ router.get('/conversations/:id', getConversations);
 router.post('/conversations', addConversation);
 
 router.put('/conversations', updateConversation);
+
+// misc.
+router.post('/links/preview', getLinkPreviewInfo);
 
 module.exports = router;
