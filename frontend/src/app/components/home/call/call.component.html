@@ -1,0 +1,35 @@
+<div fxLayout="column" [ngClass]="isMin ? 'min':'max'">
+    <!-- calling to indication -->
+    <div fxLayout="row">
+        <div fxFlex></div>
+        <div class="mat-headline">{{ getUserEmail(data.peerId).split('@')[0] |uppercase}}</div>
+        <div fxFlex="5"></div>
+    </div>
+
+    <!-- video display screen -->
+    <div [ngClass]="isMin ? 'min__peer-video':'max__peer-video'">
+        <video id="peer-video"></video>
+        <div [ngClass]="isMin ? 'min__user-video':'max__user-video'">
+            <video id="user-video"></video>
+        </div>
+    </div>
+
+    <!-- call controls: audio, video, screen share -->
+    <div fxLayout="row" fxLayoutAlign="center center">
+        <button mat-icon-button>
+            <mat-icon *ngIf="audio">mic</mat-icon>
+            <mat-icon *ngIf="!audio">mic_off</mat-icon>
+        </button>
+        <button mat-icon-button>
+            <mat-icon>call_end</mat-icon>
+        </button>
+        <button mat-icon-button>
+            <mat-icon *ngIf="video">videocam</mat-icon>
+            <mat-icon *ngIf="!video">videocam_off</mat-icon>
+        </button>
+        <button mat-icon-button>
+            <mat-icon *ngIf="screenShare">screen_share</mat-icon>
+            <mat-icon *ngIf="!screenShare">stop_screen_share</mat-icon>
+        </button>
+    </div>
+</div>

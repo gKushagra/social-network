@@ -41,3 +41,10 @@ export interface Message {
     fileLink: string,
     externalLink: string
 }
+
+export interface Call {
+    callId: string,
+    fromUserId: string,
+    toUserId: string,
+    callDate: Date
+}

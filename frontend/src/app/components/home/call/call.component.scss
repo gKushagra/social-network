@@ -1,0 +1,27 @@
+.min {
+}
+
+.max {
+}
+
+.max__peer-video {
+  width: 100% !important;
+  height: 75vh !important;
+  position: relative !important;
+}
+
+.max__user-video {
+  width: 340px !important;
+  height: 200px !important;
+  border: 1px solid gainsboro !important;
+  border-radius: 4px !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+}
+
+.min__peer-video {
+}
+
+.min__user-video {
+}

@@ -60,10 +60,12 @@
                                     <button (click)="selectContact(contact)" matTooltip="Open Chat" mat-icon-button>
                                         <mat-icon>chat</mat-icon>
                                     </button>
-                                    <button disabled matTooltip="Call" mat-icon-button>
+                                    <button (click)="isActive(contact.contactUserId) ? callContact(contact) : null"
+                                        disabled matTooltip="Call" mat-icon-button>
                                         <mat-icon>call</mat-icon>
                                     </button>
-                                    <button matTooltip="Remove Contact" mat-icon-button>
+                                    <button (click)="removeContact(contact)" matTooltip="Remove Contact"
+                                        mat-icon-button>
                                         <mat-icon>person_remove</mat-icon>
                                     </button>
                                 </div>

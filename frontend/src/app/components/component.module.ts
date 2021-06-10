@@ -17,6 +17,7 @@ import { QuillModule } from "ngx-quill";
 import { ExtLinkComponent } from './home/ext-link/ext-link.component';
 import { SafePipe } from "../pipes/safe.pipe";
 import { SendMediaComponent } from './home/chat/send-media/send-media.component';
+import { CallComponent } from './home/call/call.component';
 
 @NgModule({
     declarations: [
@@ -32,6 +33,7 @@ import { SendMediaComponent } from './home/chat/send-media/send-media.component'
         ExtLinkComponent,
         SafePipe,
         SendMediaComponent,
+        CallComponent,
     ],
     imports: [
         CommonModule,

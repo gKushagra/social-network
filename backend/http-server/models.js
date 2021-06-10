@@ -96,6 +96,14 @@ ConversationSchema.methods.addNewConv = function () {
 
 mongoose.model("Conversation", ConversationSchema);
 
+const CallSchema = new Schema({
+  callId: String,
+  fromUserId: String,
+  toUserId: String,
+  callDate: Date
+});
+
+mongoose.model("Call", CallSchema);
 
 
 

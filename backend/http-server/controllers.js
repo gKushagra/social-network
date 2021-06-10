@@ -2,10 +2,11 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../helpers/nodemailer");
+const { createRoom, genAccessToken, completeRoom } = require("../helpers/twilio");
 const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
-const linkPreviewGenerator = require("link-preview-generator");
+// const linkPreviewGenerator = require("link-preview-generator");
 
 mongoose.connect(process.env.mongodbUrl, {
   useNewUrlParser: true,
@@ -27,6 +28,7 @@ const Contact = mongoose.model("Contact");
 const Request = mongoose.model("Request");
 const Post = mongoose.model("Post");
 const Conversation = mongoose.model("Conversation");
+const Call = mongoose.model("Call");
 
 const domain = `http://localhost:4240`
 
@@ -497,14 +499,81 @@ const updateConversation = (req, res) => {
     });
 }
 
-const getLinkPreviewInfo = (req, res) => {
-  try {
-    const previewData = linkPreviewGenerator(req.body);
-    return res.status(200).json({ preview: previewData });
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(500);
-  }
+/**
+ * create a new room
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const initiateCall = (req, res) => {
+  // Authenticate user
+  const data = req.body;
+  User.find({ userId: data.fromUserId }, (err, user) => {
+    if (err) return res.sendStatus(500);
+
+    console.log(user);
+
+    if (user) {
+      createRoom()
+        .then(room => {
+          // new call doc
+          let newCall = new Call({
+            callId: room.uniqueName,
+            fromUserId: data.fromUserId,
+            toUserId: data.toUserId,
+            callDate: new Date()
+          });
+
+          newCall.save((err, c) => {
+            if (err) return res.sendStatus(500);
+
+            return res.status(200).json({ call: newCall, room: room });
+          });
+        });
+    }
+  });
+}
+
+/**
+ * change status of room to complete
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const endRoom = (req, res) => {
+  completeRoom(req.params.id)
+    .then(room => {
+      return res.status(200).json(room);
+    });
+}
+
+/**
+ * get access token
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const getAccessToken = (req, res) => {
+  // Authenticate User
+  const data = req.body;
+  User.find({ userId: data.userId }, (err, user) => {
+    if (err) return res.sendStatus(500);
+
+    if (user) {
+      let token = genAccessToken(req.body.roomId, req.body.userId);
+      return res.status(200).json({ token: token });
+    }
+  });
+}
+
+const getLinkPreviewInfo = async (req, res) => {
+  return res.sendStatus(500);
+  // try {
+  //   console.log(req.body.link);
+  //   const previewData = await linkPreviewGenerator(req.body.link);
+  //   console.log(previewData);
+  //   return res.status(200).json({ preview: previewData });
+  // } catch (error) {
+  //   console.log(error);
+  //   return res.sendStatus(500);
+  // }
 }
 
 module.exports = {
@@ -530,4 +599,7 @@ module.exports = {
   addConversation,
   updateConversation,
   getLinkPreviewInfo,
+  initiateCall,
+  getAccessToken,
+  endRoom,
 };
