@@ -7,8 +7,6 @@ import { SocketService } from 'src/app/services/socket.service';
 import { UserService } from 'src/app/services/user.service';
 import { ChatService } from "../../../services/chat.service";
 import { CallService } from "../../../services/call.service";
-import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
-import { CallComponent } from '../call/call.component';
 
 @Component({
   selector: 'app-contacts',
@@ -25,14 +23,13 @@ export class ContactsComponent implements OnInit {
   requests: Request[] = [];             // user connection request received
   sentRequests: Request[] = [];         // user connection request received      
   currUser: User;                       // local curr user
-  incomingCall: any;                    // store room properties
+  isCall: boolean = false;              // is call el active
 
   constructor(
     private chatService: ChatService,
     private userService: UserService,
     private socketService: SocketService,
     private callService: CallService,
-    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -100,9 +97,16 @@ export class ContactsComponent implements OnInit {
 
       if ('type' in msg && msg['type'] === "call") {
         // msg = { roomId, peerId }
-        this.incomingCall = msg;
+        this.callService.notifyIncomingCall(msg);
       }
     });
+
+    // subscribe to incoming and outgoing calls
+    this.callService.obsrvCall.subscribe(callStatusCode => {
+      if (callStatusCode === 10) this.isCall = true;
+      else if (callStatusCode === 20) this.isCall = false;
+    });
+
   }
 
   /**
@@ -139,80 +143,7 @@ export class ContactsComponent implements OnInit {
       callDate: null
     }
 
-    let room, token; // local temp var
-
-    // create new room
-    this.callService.createRoom(callObj)
-      .subscribe((res: any) => {
-        console.log(res);
-        room = res.room;
-      }, (error) => {
-        if (error.status === 500) console.log("Server Error");
-      }, () => {
-        // get access token
-        this.callService.getAccessToken({
-          roomId: room['uniqueName'],
-          userId: this.userService.currUser.id
-        }).subscribe((res: any) => {
-          console.log(res);
-          token = res.token;
-        }, (error) => {
-          if (error.status === 500) console.log("Server Error");
-        }, () => {
-          // open call dialog
-          let dialogConfig: MatDialogConfig = new MatDialogConfig();
-          dialogConfig.minWidth = window.innerWidth;
-          dialogConfig.minHeight = window.innerHeight;
-          dialogConfig.disableClose = true;
-          dialogConfig.data = { token: token, room: room, peerId: callObj.toUserId };
-          let callDialogRef: MatDialogRef<CallComponent> = this.dialog.open(CallComponent, dialogConfig);
-          callDialogRef.beforeClosed().subscribe(data => {
-            console.log(data);
-            token = null;
-            room = null;
-            // end room: dont know if req.
-            // this.callService.endRoom(room.unique_name)
-            //   .subscribe((res: any) => {
-            //     console.log(res);
-            //   }, (error) => {
-            //     if (error.status === 500) console.log("Server Error");
-            //   }, () => { });
-          });
-        });
-      });
-  }
-
-  answerCall(): void {
-    let room, token; // local temp var
-
-    // get access token
-    this.callService.getAccessToken({
-      roomId: this.incomingCall.roomId,
-      userId: this.userService.currUser.id
-    }).subscribe((res: any) => {
-      console.log(res);
-      token = res.token;
-    }, (error) => {
-      if (error.status === 500) console.log("Server Error");
-    }, () => {
-      // open call dialog
-      let dialogConfig: MatDialogConfig = new MatDialogConfig();
-      dialogConfig.minWidth = window.innerWidth;
-      dialogConfig.minHeight = window.innerHeight;
-      dialogConfig.disableClose = true;
-      dialogConfig.data = {
-        token: token,
-        room: { uniqueName: this.incomingCall.roomId },
-        peerId: this.incomingCall.fromPeerId
-      };
-      let callDialogRef: MatDialogRef<CallComponent> = this.dialog.open(CallComponent, dialogConfig);
-      callDialogRef.beforeClosed().subscribe(data => {
-        console.log(data);
-        token = null;
-        room = null;
-        this.incomingCall = null;
-      });
-    });
+    this.callService.notifyOutgoingCall(callObj);
   }
 
   /**

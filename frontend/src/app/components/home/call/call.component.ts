@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { CallService } from 'src/app/services/call.service';
 import { SocketService } from 'src/app/services/socket.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -10,38 +11,47 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class CallComponent implements OnInit {
 
-  isMin: boolean = false;
-
+  data: any;
   call: any;
+  isMin: boolean = true;
   audio: boolean = true;
   video: boolean = true;
   screenShare: boolean = false;
 
+  isIncoming: boolean = false;
+
+  // { token, room, peerId }
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any, // { token, room, peerId }
-    private dialogRef: MatDialogRef<CallComponent>,
+    private callService: CallService,
     private userService: UserService,
     private socketService: SocketService,
   ) { }
 
   ngOnInit(): void {
-    this.placeCall();
+    if (this.callService.incomingCall) {
+      this.data = this.callService.incomingCall;
+      this.isIncoming = true;
+    } else if (this.callService.outgoingCall) {
+      this.data = this.callService.outgoingCall;
+      this.joinCall();
+      this.notifyPeer();
+    }
   }
 
-  placeCall(): void {
+  joinCall(): void {
     console.log(this.data);
     // @ts-ignore
     Twilio.Video.connect(this.data.token, {
       audio: true,
+      video: true,
       name: this.data.room['uniqueName'],
-      video: { width: 640 }
     }).then(room => {
       this.call = room;
       console.log(`Successfully joined call: ${room}`);
-
-      if ('url' in this.data.room) {
-        this.notifyPeer();
-      }
+      if (this.isIncoming) this.isIncoming = false;
+      // if ('url' in this.data.room) {
+      //   this.notifyPeer();
+      // }
 
       // local tracks
       room.localParticipant.tracks.forEach(publication => {
@@ -100,7 +110,7 @@ export class CallComponent implements OnInit {
   }
 
   enDisAudio(): void {
-    this.audio = !this.audio;
+    this.audio ? this.audio = false : this.audio = true;
     this.call.localParticipant.audioTracks.forEach(publication => {
       if (this.audio) publication.track.disable()
       else publication.track.enable()
@@ -108,15 +118,24 @@ export class CallComponent implements OnInit {
   }
 
   enDisVideo(): void {
-    this.video = !this.video;
+    this.video ? this.video = false : this.video = true;
     this.call.localParticipant.videoTracks.forEach(publication => {
-      if (this.video) publication.track.disable()
-      else publication.track.enable()
+      if (this.video) {
+        publication.track.disable()
+        document.getElementById('user-video').appendChild(publication.track.attach());
+      }
+      else {
+        publication.track.enable()
+        const attachedElements = publication.track.detach();
+        attachedElements.forEach(element => {
+          element.remove();
+        });
+      }
     });
   }
 
   enDisScreenShare(): void {
-    this.screenShare = !this.screenShare;
+    this.screenShare ? this.screenShare = false : this.screenShare = true;
     let screenTrack;
     if (this.screenShare) {
       this.call.localParticipant.unpublishTrack(screenTrack);
@@ -146,7 +165,25 @@ export class CallComponent implements OnInit {
 
     this.call.disconnect();
 
-    this.dialogRef.close();
+    if (this.callService.incomingCall) this.callService.incomingCall = null;
+    else this.callService.outgoingCall = null;
+
+    this.data = null;
+    this.call = null;
+
+    this.callService._call.next(20);
+  }
+
+  expandDisplay(): void {
+    this.isMin ? this.isMin = false : this.isMin = true;
+  }
+
+  answerCall(): void {
+    this.joinCall();
+  }
+
+  declineCall(): void {
+    // notify other user
   }
 
   /**

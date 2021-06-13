@@ -1,7 +1,11 @@
 .min {
+  width: 340px;
+  height: 200px;
 }
 
 .max {
+  width: 99vw;
+  height: 99vw;
 }
 
 .max__peer-video {
@@ -21,7 +25,24 @@
 }
 
 .min__peer-video {
+  width: 100% !important;
+  height: 150px !important;
+  position: relative !important;
 }
 
 .min__user-video {
+  width: 64px !important;
+  height: 64px !important;
+  border: 1px solid gainsboro !important;
+  border-radius: 4px !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+}
+
+.call-div {
+  border: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  background: #fff;
+  border-radius: 4px;
 }

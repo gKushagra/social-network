@@ -1,21 +1,40 @@
-<div fxLayout="column" [ngClass]="isMin ? 'min':'max'">
+<div class="call-div" fxLayout="column" [ngClass]="isMin ? 'min':'max'">
     <!-- calling to indication -->
-    <div fxLayout="row">
+    <div *ngIf="!isIncoming" fxLayout="row">
         <div fxFlex></div>
-        <div class="mat-headline">{{ getUserEmail(data.peerId).split('@')[0] |uppercase}}</div>
+        <div>{{ getUserEmail(data.peerId).split('@')[0] |uppercase}}</div>
         <div fxFlex="5"></div>
     </div>
 
     <!-- video display screen -->
-    <div id="peer-video" [ngClass]="isMin ? 'min__peer-video':'max__peer-video'">
+    <div *ngIf="!isIncoming" id="peer-video" [ngClass]="isMin ? 'min__peer-video':'max__peer-video'">
         <div id="user-video" [ngClass]="isMin ? 'min__user-video':'max__user-video'"></div>
     </div>
 
+    <div *ngIf="isIncoming" fxLayout="row" fxLayoutAlign="center center">
+        <div fxFlex="2"></div>
+        <div>
+            {{ 'Incoming call from ' + getUserEmail(data.peerId).split('@')[0] |uppercase}}
+        </div>
+        <div fxFlex></div>
+        <button (click)="answerCall()" mat-icon-button>
+            <mat-icon>ring_volume</mat-icon>
+        </button>
+        <button (click)="declineCall()" mat-icon-button>
+            <mat-icon>call_end</mat-icon>
+        </button>
+        <div fxFlex="2"></div>
+    </div>
+
     <!-- call controls: audio, video, screen share -->
-    <div fxLayout="row" fxLayoutAlign="center center">
+    <div *ngIf="!isIncoming" fxLayout="row" fxLayoutAlign="center center">
+        <button (click)="expandDisplay()" mat-icon-button>
+            <mat-icon *ngIf="isMin">expand_in_full</mat-icon>
+            <mat-icon *ngIf="!isMin">close_fullscreen</mat-icon>
+        </button>
         <button (click)="enDisAudio()" mat-icon-button>
-            <mat-icon *ngIf="audio">mic</mat-icon>
-            <mat-icon *ngIf="!audio">mic_off</mat-icon>
+            <mat-icon *ngIf="!audio">mic</mat-icon>
+            <mat-icon *ngIf="audio">mic_off</mat-icon>
         </button>
         <div fxFlex="2"></div>
         <button (click)="endCall()" mat-icon-button>
@@ -23,13 +42,13 @@
         </button>
         <div fxFlex="2"></div>
         <button (click)="enDisVideo()" mat-icon-button>
-            <mat-icon *ngIf="video">videocam</mat-icon>
-            <mat-icon *ngIf="!video">videocam_off</mat-icon>
+            <mat-icon *ngIf="!video">videocam</mat-icon>
+            <mat-icon *ngIf="video">videocam_off</mat-icon>
         </button>
         <div fxFlex="2"></div>
         <button (click)="enDisScreenShare()" mat-icon-button>
-            <mat-icon *ngIf="screenShare">screen_share</mat-icon>
-            <mat-icon *ngIf="!screenShare">stop_screen_share</mat-icon>
+            <mat-icon *ngIf="!screenShare">screen_share</mat-icon>
+            <mat-icon *ngIf="screenShare">stop_screen_share</mat-icon>
         </button>
     </div>
 </div>
