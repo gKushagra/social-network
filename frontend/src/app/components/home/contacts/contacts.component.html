@@ -15,6 +15,7 @@
             <div fxFlex="5"></div>
         </div>
         <mat-divider style="margin-top: 21px;"></mat-divider>
+
         <!-- search users -->
         <div fxLayout="row" style="width: 100%; margin-top: 21px;">
             <div fxFlex="5"></div>
@@ -36,6 +37,7 @@
             </mat-form-field>
             <div fxFlex="5"></div>
         </div>
+
         <mat-accordion>
             <!-- contacts -->
             <mat-expansion-panel expanded=false class="mat-elevation-z0">
@@ -61,7 +63,7 @@
                                         <mat-icon>chat</mat-icon>
                                     </button>
                                     <button (click)="isActive(contact.contactUserId) ? callContact(contact) : null"
-                                        disabled matTooltip="Call" mat-icon-button>
+                                        matTooltip="Call" mat-icon-button>
                                         <mat-icon>call</mat-icon>
                                     </button>
                                     <button (click)="removeContact(contact)" matTooltip="Remove Contact"
@@ -74,6 +76,7 @@
                     </mat-list>
                 </div>
             </mat-expansion-panel>
+
             <!-- Requests -->
             <mat-expansion-panel expanded=false class="mat-elevation-z0">
                 <mat-expansion-panel-header>
@@ -118,10 +121,22 @@
                 </div>
             </mat-expansion-panel>
         </mat-accordion>
-        <!-- <div fxLayout="row" style="width: 100%;">
+
+        <!-- incoming call -->
+        <div *ngIf="incomingCall" fxLayout="row" style="width: 100%;">
             <div fxFlex="5"></div>
-            <div class="mat-subheading-1">Contacts</div>
+            <div>
+                {{ 'Incoming call from ' + getUserEmail(incomingCall.fromPeerId).split('@')[0] }}
+            </div>
             <div fxFlex></div>
-        </div> -->
+            <button (click)="answerCall()" mat-icon-button>
+                <mat-icon>ring_volume</mat-icon>
+            </button>
+            <div fxFlex="1"></div>
+            <button (click)="answerCall()" mat-icon-button>
+                <mat-icon>call_end</mat-icon>
+            </button>
+            <div fxFlex="5"></div>
+        </div>
     </div>
 </div>

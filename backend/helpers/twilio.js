@@ -32,6 +32,7 @@ const completeRoom = (roomId) => {
  * @returns access token
  */
 const genAccessToken = (room, user) => {
+    console.log(room, user);
     const AccessToken = require('twilio').jwt.AccessToken;
     const VideoGrant = AccessToken.VideoGrant;
 
@@ -47,7 +48,7 @@ const genAccessToken = (room, user) => {
     );
 
     token.addGrant(videoGrant);
-    // console.log(token.toJwt());
+    console.log(token.toJwt());
     return token.toJwt();
 }
 

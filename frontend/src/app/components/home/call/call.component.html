@@ -7,27 +7,27 @@
     </div>
 
     <!-- video display screen -->
-    <div [ngClass]="isMin ? 'min__peer-video':'max__peer-video'">
-        <video id="peer-video"></video>
-        <div [ngClass]="isMin ? 'min__user-video':'max__user-video'">
-            <video id="user-video"></video>
-        </div>
+    <div id="peer-video" [ngClass]="isMin ? 'min__peer-video':'max__peer-video'">
+        <div id="user-video" [ngClass]="isMin ? 'min__user-video':'max__user-video'"></div>
     </div>
 
     <!-- call controls: audio, video, screen share -->
     <div fxLayout="row" fxLayoutAlign="center center">
-        <button mat-icon-button>
+        <button (click)="enDisAudio()" mat-icon-button>
             <mat-icon *ngIf="audio">mic</mat-icon>
             <mat-icon *ngIf="!audio">mic_off</mat-icon>
         </button>
-        <button mat-icon-button>
+        <div fxFlex="2"></div>
+        <button (click)="endCall()" mat-icon-button>
             <mat-icon>call_end</mat-icon>
         </button>
-        <button mat-icon-button>
+        <div fxFlex="2"></div>
+        <button (click)="enDisVideo()" mat-icon-button>
             <mat-icon *ngIf="video">videocam</mat-icon>
             <mat-icon *ngIf="!video">videocam_off</mat-icon>
         </button>
-        <button mat-icon-button>
+        <div fxFlex="2"></div>
+        <button (click)="enDisScreenShare()" mat-icon-button>
             <mat-icon *ngIf="screenShare">screen_share</mat-icon>
             <mat-icon *ngIf="!screenShare">stop_screen_share</mat-icon>
         </button>

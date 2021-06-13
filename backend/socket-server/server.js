@@ -43,6 +43,14 @@ wss.on('connection', function connection(ws) {
                     client.send(JSON.stringify(message));
                 }
             });
+        } if ('type' in message && message['type'] === "call") {
+            console.log(message);
+            wss.clients.forEach(client => {
+                console.log(client._id);
+                if (client._id === message.toPeerId) {
+                    client.send(JSON.stringify(message));
+                }
+            });
         } else {
             wss.clients.forEach(client => {
                 console.log(client._id);
