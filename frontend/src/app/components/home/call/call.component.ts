@@ -262,61 +262,63 @@ export class CallComponent implements OnInit {
    * end call
    */
   endCall(): void {
-    this.call.localParticipant.tracks.forEach(publication => {
-      // console.log(publication);
-      const attachedElements = publication.track.detach();
-      attachedElements.forEach(element => {
-        element.remove();
+    if (this.call) {
+      this.call.localParticipant.tracks.forEach(publication => {
+        // console.log(publication);
+        const attachedElements = publication.track.detach();
+        attachedElements.forEach(element => {
+          element.remove();
+        });
       });
-    });
 
-    // disconnect call
-    this.call.disconnect();
+      // disconnect call
+      this.call.disconnect();
 
-    // notify peer
-    this.socketService.sendMessage({
-      type: 'call-disconnected',
-      roomId: this.data.room['uniqueName'],
-      toPeerId: this.data.peerId,
-      fromPeerId: this.userService.currUser.id
-    });
+      // notify peer
+      this.socketService.sendMessage({
+        type: 'call-disconnected',
+        roomId: this.data.room['uniqueName'],
+        toPeerId: this.data.peerId,
+        fromPeerId: this.userService.currUser.id
+      });
 
-    // remove elements
-    let parentEl = document.getElementById('peer-video');
-    if (parentEl && parentEl.hasChildNodes()) {
-      for (let i = 0; i < parentEl.children.length; i++) {
-        parentEl.children[i].remove();
+      // remove elements
+      let parentEl = document.getElementById('peer-video');
+      if (parentEl && parentEl.hasChildNodes()) {
+        for (let i = 0; i < parentEl.children.length; i++) {
+          parentEl.children[i].remove();
+        }
       }
+
+      // calc call duration and update on caller side
+      if (this.callService.outgoingCall) {
+        let callInHistory = this.callService.callHistory.outgoing.filter(_c => {
+          return _c.callId === this.data.room['uniqueName']
+        })[0];
+
+        let callStartTime = new Date(callInHistory.callDate).getTime();
+        let callEndTime = new Date().getTime();
+        let durationInMins = Math.round((((callEndTime - callStartTime) % 86400000) % 3600000) / 60000);
+        callInHistory.duration = durationInMins;
+
+        // update call duration
+        this.callService.updateCall({ callId: this.data.room['uniqueName'], duration: durationInMins })
+          .subscribe((res: any) => {
+            console.log(res);
+          }, (error) => {
+            if (error.status === 500) console.log('Server Error');
+          }, () => { });
+      }
+
+      // set null
+      if (this.callService.incomingCall) this.callService.incomingCall = null;
+      else this.callService.outgoingCall = null;
+
+      this.data = null;
+      this.call = null;
+
+      this.callService._call.next(20);
     }
-
-    // calc call duration and update on caller side
-    if (this.callService.outgoingCall) {
-      let callInHistory = this.callService.callHistory.incoming.filter(_c => {
-        return _c.callId === this.data.room['uniqueName']
-      })[0];
-
-      let callStartTime = new Date(callInHistory.callDate).getTime();
-      let callEndTime = new Date().getTime();
-      let durationInMins = Math.round((((callEndTime - callStartTime) % 86400000) % 3600000) / 60000);
-      callInHistory.duration = durationInMins;
-
-      // update call duration
-      this.callService.updateCall({ callId: this.data.room['uniqueName'], duration: durationInMins })
-        .subscribe((res: any) => {
-          console.log(res);
-        }, (error) => {
-          if (error.status === 500) console.log('Server Error');
-        }, () => { });
-    }
-
-    // set null
-    if (this.callService.incomingCall) this.callService.incomingCall = null;
-    else this.callService.outgoingCall = null;
-
-    this.data = null;
-    this.call = null;
-
-    this.callService._call.next(20);
   }
 
   /**
