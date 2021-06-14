@@ -46,7 +46,7 @@
                         Contacts
                     </mat-panel-title>
                 </mat-expansion-panel-header>
-                <div fxLayout="row" style="width: 100%;">
+                <div fxLayout="row" style="width: 100%; height: 30vh !important; overflow: auto;">
                     <!-- <div fxFlex="5"></div> -->
                     <mat-list fxFlex>
                         <mat-list-item *ngFor="let contact of contacts" [value]="contact">
@@ -84,7 +84,7 @@
                         Requests
                     </mat-panel-title>
                 </mat-expansion-panel-header>
-                <div fxLayout="row" style="width: 100%;">
+                <div fxLayout="row" style="width: 100%; height: 30vh !important; overflow: auto;">
                     <div fxFlex="5"></div>
                     <mat-list fxFlex>
                         <div mat-subheader>Received</div>
@@ -120,12 +120,51 @@
                     <div fxFlex="5"></div>
                 </div>
             </mat-expansion-panel>
+
+            <!-- Call History -->
+            <mat-expansion-panel expanded=false class="mat-elevation-z0">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Call History
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="row" style="width: 100%; height: 30vh !important; overflow: auto;">
+                    <div fxFlex="5"></div>
+                    <mat-list fxFlex>
+                        <div mat-subheader>Incoming</div>
+                        <mat-list-item *ngFor="let call of callHistory.incoming" [value]="call">
+                            <div *ngIf="call.fromUserId !== currUser.id" mat-line>
+                                <div fxFlex="row" fxLayoutAlign="start center" style="width: 100%;">
+                                    <div fxFlex="2"></div>
+                                    <div>{{ getUserEmail(call.fromUserId).split('@')[0] |lowercase}}</div>
+                                    <div fxFlex="10"></div>
+                                    <small>{{ call.callDate |date:'short' }}</small>
+                                    <div fxFlex></div>
+                                </div>
+                            </div>
+                        </mat-list-item>
+                        <div mat-subheader>Outgoing</div>
+                        <mat-list-item *ngFor="let call of callHistory.outgoing" [value]="request">
+                            <div *ngIf="call.toUserId !== currUser.id" mat-line>
+                                <div fxFlex="row" fxLayoutAlign="start center" style="width: 100%;">
+                                    <div fxFlex="2"></div>
+                                    <div>{{ getUserEmail(call.toUserId).split('@')[0] |lowercase}}</div>
+                                    <div fxFlex="10"></div>
+                                    <small>{{ call.callDate |date:'short' }}</small>
+                                    <div fxFlex></div>
+                                </div>
+                            </div>
+                        </mat-list-item>
+                    </mat-list>
+                    <div fxFlex="5"></div>
+                </div>
+            </mat-expansion-panel>
         </mat-accordion>
 
         <!-- draggable call el -->
         <div *ngIf="isCall" class="call-div" cdkDrag>
             <app-call></app-call>
         </div>
-        
+
     </div>
 </div>

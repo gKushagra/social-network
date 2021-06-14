@@ -24,6 +24,10 @@ export class ContactsComponent implements OnInit {
   sentRequests: Request[] = [];         // user connection request received      
   currUser: User;                       // local curr user
   isCall: boolean = false;              // is call el active
+  callHistory: any = {                  // store call history
+    incoming: [], 
+    outgoing: [] 
+  }                     
 
   constructor(
     private chatService: ChatService,
@@ -79,6 +83,13 @@ export class ContactsComponent implements OnInit {
         this.requests = this.userService.requests;
         this.sentRequests = this.userService.sentRequests;
         console.log(this.requests, this.sentRequests);
+      }
+    });
+
+    // subscribe to changes in call history
+    this.callService.obsrvUpdateCallHistory.subscribe(avl => {
+      if (avl) {
+        this.callHistory = this.callService.callHistory;
       }
     });
 

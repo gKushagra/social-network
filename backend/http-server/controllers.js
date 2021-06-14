@@ -563,6 +563,29 @@ const getAccessToken = (req, res) => {
   });
 }
 
+/**
+ * get call history for a user
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const getCallHistory = (req, res) => {
+  const userId = req.params.id;
+  Call.find({ fromUserId: userId }, (err, outgoing) => {
+    if (err) return res.sendStatus(500);
+
+    Call.find({ toUserId: userId }, (err, incoming) => {
+      if (err) return res.sendStatus(500);
+
+      return res.status(200).json({
+        callHistory: {
+          incoming: incoming,
+          outgoing: outgoing
+        }
+      });
+    });
+  });
+}
+
 const getLinkPreviewInfo = async (req, res) => {
   return res.sendStatus(500);
   // try {
@@ -602,4 +625,5 @@ module.exports = {
   initiateCall,
   getAccessToken,
   endRoom,
+  getCallHistory,
 };

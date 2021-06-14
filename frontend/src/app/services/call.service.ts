@@ -16,10 +16,18 @@ export class CallService {
   public _call: Subject<Number> = new Subject();
   public obsrvCall: Observable<Number> = this._call.asObservable();
 
+  public callHistory: any[] = [];
+  public updateCallHistory: Subject<any> = new Subject();
+  public obsrvUpdateCallHistory: Observable<any> = this.updateCallHistory.asObservable();
+
   constructor(
     private http: HttpClient,
     private userService: UserService,
   ) { }
+
+  getCallHistory(): any {
+    return this.http.get(environment.callUrl + `/${this.userService.currUser.id}`);
+  }
 
   createRoom(payload: Call): any {
     return this.http.post(environment.callUrl, payload);
@@ -53,23 +61,6 @@ export class CallService {
       this.incomingCall['peerId'] = data.fromPeerId;
 
       this._call.next(10);
-      // DEPRECATED
-      // let dialogConfig: MatDialogConfig = new MatDialogConfig();
-      // dialogConfig.minWidth = window.innerWidth;
-      // dialogConfig.minHeight = window.innerHeight;
-      // dialogConfig.disableClose = true;
-      // dialogConfig.data = {
-      //   token: token,
-      //   room: { uniqueName: this.incomingCall.roomId },
-      //   peerId: this.incomingCall.fromPeerId
-      // };
-      // let callDialogRef: MatDialogRef<CallComponent> = this.dialog.open(CallComponent, dialogConfig);
-      // callDialogRef.beforeClosed().subscribe(data => {
-      //   console.log(data);
-      //   token = null;
-      //   room = null;
-      //   this.incomingCall = null;
-      // });
     });
   }
 
@@ -81,6 +72,8 @@ export class CallService {
       .subscribe((res: any) => {
         console.log(res);
         room = res.room;
+        this.callHistory = res.call;
+        this.updateCallHistory.next(true);
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
       }, () => {
@@ -102,25 +95,6 @@ export class CallService {
           };
 
           this._call.next(10);
-          // DEPRECATED
-          // let dialogConfig: MatDialogConfig = new MatDialogConfig();
-          // dialogConfig.minWidth = window.innerWidth;
-          // dialogConfig.minHeight = window.innerHeight;
-          // dialogConfig.disableClose = true;
-          // dialogConfig.data = { token: token, room: room, peerId: callObj.toUserId };
-          // let callDialogRef: MatDialogRef<CallComponent> = this.dialog.open(CallComponent, dialogConfig);
-          // callDialogRef.beforeClosed().subscribe(data => {
-          //   console.log(data);
-          //   token = null;
-          //   room = null;
-          //   // end room: dont know if req.
-          //   // this.callService.endRoom(room.unique_name)
-          //   //   .subscribe((res: any) => {
-          //   //     console.log(res);
-          //   //   }, (error) => {
-          //   //     if (error.status === 500) console.log("Server Error");
-          //   //   }, () => { });
-          // });
         });
       });
   }

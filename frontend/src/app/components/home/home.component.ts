@@ -4,6 +4,7 @@ import { UserService } from 'src/app/services/user.service';
 import { SocketService } from "src/app/services/socket.service";
 import { environment } from 'src/environments/environment';
 import { ChatService } from 'src/app/services/chat.service';
+import { CallService } from 'src/app/services/call.service';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +20,7 @@ export class HomeComponent implements OnInit {
     private userService: UserService,
     private socketService: SocketService,
     private chatService: ChatService,
+    private callService: CallService,
   ) { }
 
   ngOnInit(): void {
@@ -48,6 +50,13 @@ export class HomeComponent implements OnInit {
         this.userService.requests = res.requests;
         this.userService.sentRequests = res.sentRequests;
         this.userService.refreshAvlRequests();
+      });
+
+    this.callService.getCallHistory()
+      .subscribe((res: any) => {
+        console.log(res);
+        this.callService.callHistory = res.callHistory;
+        this.callService.updateCallHistory.next(true);
       });
 
     this.chatService.getConversations();
