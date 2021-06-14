@@ -11,14 +11,13 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class CallComponent implements OnInit {
 
-  data: any;
-  call: any;
-  isMin: boolean = true;
-  audio: boolean = true;
-  video: boolean = true;
-  screenShare: boolean = false;
-
-  isIncoming: boolean = false;
+  data: any;                      // incoming or outgoing
+  call: any;                      // call props
+  isMin: boolean = true;          // is window minimized
+  audio: boolean = true;          // is mute
+  video: boolean = true;          // is video on
+  screenShare: boolean = false;   // is sharing screen
+  isIncoming: boolean = false;    // is call incoming
 
   // { token, room, peerId }
   constructor(
@@ -38,6 +37,9 @@ export class CallComponent implements OnInit {
     }
   }
 
+  /**
+   * join room
+   */
   joinCall(): void {
     console.log(this.data);
     // @ts-ignore
@@ -48,18 +50,12 @@ export class CallComponent implements OnInit {
     }).then(room => {
       this.call = room;
       console.log(`Successfully joined call: ${room}`);
-      if (this.isIncoming) this.isIncoming = false;
-      // if ('url' in this.data.room) {
-      //   this.notifyPeer();
-      // }
 
-      // local tracks
-      room.localParticipant.tracks.forEach(publication => {
-        if (publication.isEnabled) {
-          const track = publication.track;
-          document.getElementById('user-video').appendChild(track.attach());
-        }
-      });
+      if (this.isIncoming) this.isIncoming = false;
+
+      // disable audio and video
+      this.enDisAudio();
+      this.enDisVideo();
 
       // existing remote tracks
       room.participants.forEach(participant => {
@@ -99,6 +95,10 @@ export class CallComponent implements OnInit {
     });
   }
 
+  /**
+   * notify peer after successfully
+   * joining room
+   */
   notifyPeer(): void {
     console.log(this.data);
     this.socketService.sendMessage({
@@ -109,33 +109,32 @@ export class CallComponent implements OnInit {
     });
   }
 
+  /**
+   * mute unmute audio
+   */
   enDisAudio(): void {
-    this.audio ? this.audio = false : this.audio = true;
     this.call.localParticipant.audioTracks.forEach(publication => {
       if (this.audio) publication.track.disable()
       else publication.track.enable()
     });
+    this.audio ? this.audio = false : this.audio = true;
   }
 
+  /**
+   * show hide video
+   */
   enDisVideo(): void {
-    this.video ? this.video = false : this.video = true;
     this.call.localParticipant.videoTracks.forEach(publication => {
-      if (this.video) {
-        publication.track.disable()
-        document.getElementById('user-video').appendChild(publication.track.attach());
-      }
-      else {
-        publication.track.enable()
-        const attachedElements = publication.track.detach();
-        attachedElements.forEach(element => {
-          element.remove();
-        });
-      }
+      if (this.video) publication.track.disable()
+      else publication.track.enable()
     });
+    this.video ? this.video = false : this.video = true;
   }
 
+  /**
+   * start stop screen share
+   */
   enDisScreenShare(): void {
-    this.screenShare ? this.screenShare = false : this.screenShare = true;
     let screenTrack;
     if (this.screenShare) {
       this.call.localParticipant.unpublishTrack(screenTrack);
@@ -153,8 +152,12 @@ export class CallComponent implements OnInit {
           console.log(`Screen Share failed`);
         });
     }
+    this.screenShare ? this.screenShare = false : this.screenShare = true;
   }
 
+  /**
+   * end call
+   */
   endCall(): void {
     this.call.localParticipant.tracks.forEach(publication => {
       const attachedElements = publication.track.detach();
@@ -163,8 +166,10 @@ export class CallComponent implements OnInit {
       });
     });
 
+    // disconnect call
     this.call.disconnect();
 
+    // set null
     if (this.callService.incomingCall) this.callService.incomingCall = null;
     else this.callService.outgoingCall = null;
 
@@ -174,14 +179,23 @@ export class CallComponent implements OnInit {
     this.callService._call.next(20);
   }
 
+  /**
+   * maximize minimize call el
+   */
   expandDisplay(): void {
     this.isMin ? this.isMin = false : this.isMin = true;
   }
 
+  /**
+   * answer incoming call
+   */
   answerCall(): void {
     this.joinCall();
   }
 
+  /**
+   * decline incoming call
+   */
   declineCall(): void {
     // notify other user
   }

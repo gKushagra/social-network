@@ -1,9 +1,9 @@
 <div class="call-div" fxLayout="column" [ngClass]="isMin ? 'min':'max'">
     <!-- calling to indication -->
     <div *ngIf="!isIncoming" fxLayout="row">
-        <div fxFlex></div>
-        <div>{{ getUserEmail(data.peerId).split('@')[0] |uppercase}}</div>
         <div fxFlex="5"></div>
+        <div class="mat-headline">{{ getUserEmail(data.peerId).split('@')[0] |uppercase}}</div>
+        <div fxFlex></div>
     </div>
 
     <!-- video display screen -->
@@ -29,26 +29,26 @@
     <!-- call controls: audio, video, screen share -->
     <div *ngIf="!isIncoming" fxLayout="row" fxLayoutAlign="center center">
         <button (click)="expandDisplay()" mat-icon-button>
-            <mat-icon *ngIf="isMin">expand_in_full</mat-icon>
-            <mat-icon *ngIf="!isMin">close_fullscreen</mat-icon>
+            <mat-icon matTooltip="Maximize" *ngIf="isMin">open_in_full</mat-icon>
+            <mat-icon matTooltip="Minimize" *ngIf="!isMin">close_fullscreen</mat-icon>
         </button>
         <button (click)="enDisAudio()" mat-icon-button>
-            <mat-icon *ngIf="!audio">mic</mat-icon>
-            <mat-icon *ngIf="audio">mic_off</mat-icon>
+            <mat-icon matTooltip="Mute" *ngIf="!audio">mic</mat-icon>
+            <mat-icon matTooltip="Unmute" *ngIf="audio">mic_off</mat-icon>
         </button>
         <div fxFlex="2"></div>
         <button (click)="endCall()" mat-icon-button>
-            <mat-icon>call_end</mat-icon>
+            <mat-icon matTooltip="End Call">call_end</mat-icon>
         </button>
         <div fxFlex="2"></div>
         <button (click)="enDisVideo()" mat-icon-button>
-            <mat-icon *ngIf="!video">videocam</mat-icon>
-            <mat-icon *ngIf="video">videocam_off</mat-icon>
+            <mat-icon matTooltip="Video On" *ngIf="!video">videocam</mat-icon>
+            <mat-icon matTooltip="Video Off" *ngIf="video">videocam_off</mat-icon>
         </button>
         <div fxFlex="2"></div>
         <button (click)="enDisScreenShare()" mat-icon-button>
-            <mat-icon *ngIf="!screenShare">screen_share</mat-icon>
-            <mat-icon *ngIf="screenShare">stop_screen_share</mat-icon>
+            <mat-icon matTooltip="Share Screen" *ngIf="!screenShare">screen_share</mat-icon>
+            <mat-icon matTooltip="Stop Screen Share" *ngIf="screenShare">stop_screen_share</mat-icon>
         </button>
     </div>
 </div>
