@@ -15,8 +15,12 @@ export class CallComponent implements OnInit {
   call: any;                      // call props
   isMin: boolean = true;          // is window minimized
   audio: boolean = true;          // is mute
+  isPeerAudio: boolean = false;   // is peer audio on
   video: boolean = true;          // is video on
+  isPeerVideo: boolean = false;   // is peer video on
   screenShare: boolean = false;   // is sharing screen
+  isPeerScreenShare: boolean      // is peer screen share on
+    = false;
   isIncoming: boolean = false;    // is call incoming
 
   // { token, room, peerId }
@@ -66,7 +70,20 @@ export class CallComponent implements OnInit {
         });
 
         participant.on('trackSubscribed', track => {
+          // append video el
           document.getElementById('peer-video').appendChild(track.attach());
+          // adjust peer video el dimen
+          this.adjustVideoSize();
+          // listen to peer video disable
+          track.on('disabled', () => {
+            this.isPeerVideo = false;
+            this.adjustVideoSize();
+          });
+          // listen to peer video enable
+          track.on('enabled', () => {
+            this.isPeerVideo = true;
+            this.adjustVideoSize();
+          });
         });
       });
 
@@ -82,7 +99,20 @@ export class CallComponent implements OnInit {
         });
 
         participant.on('trackSubscribed', track => {
+          // append video el
           document.getElementById('peer-video').appendChild(track.attach());
+          // adjust peer video el dimen
+          this.adjustVideoSize();
+          // listen to peer video disable
+          track.on('disabled', () => {
+            this.isPeerVideo = false;
+            this.adjustVideoSize();
+          });
+          // listen to peer video enable
+          track.on('enabled', () => {
+            this.isPeerVideo = true;
+            this.adjustVideoSize();
+          });
         });
       });
 
@@ -144,9 +174,17 @@ export class CallComponent implements OnInit {
       // @ts-ignore
       navigator.mediaDevices.getDisplayMedia()
         .then(stream => {
-          // @ts-ignore
-          screenTrack = new Twilio.Video.LocalVideoTrack(stream.getTracks()[0]);
-          this.call.localParticipant.publishTrack(screenTrack);
+          // disable video to enable screen share
+          this.call.localParticipant.videoTracks.forEach(publication => {
+            if (this.video) publication.track.disable();
+          });
+          this.video = false;
+
+          setTimeout(() => {
+            // @ts-ignore
+            screenTrack = new Twilio.Video.LocalVideoTrack(stream.getTracks()[0]);
+            this.call.localParticipant.publishTrack(screenTrack);
+          }, 1500);
         })
         .catch(() => {
           console.log(`Screen Share failed`);
@@ -184,6 +222,7 @@ export class CallComponent implements OnInit {
    */
   expandDisplay(): void {
     this.isMin ? this.isMin = false : this.isMin = true;
+    this.adjustVideoSize();
   }
 
   /**
@@ -198,6 +237,34 @@ export class CallComponent implements OnInit {
    */
   declineCall(): void {
     // notify other user
+  }
+
+  /**
+   * dynamically adjust the 
+   * track dimensions
+   */
+  adjustVideoSize(): void {
+    let parentEl = document.getElementById('peer-video');
+    if (parentEl.children && parentEl.children.length > 0) {
+      for (let i = 0; i < parentEl.children.length; i++) {
+        let videoEl;
+        if (parentEl.children[i].tagName === 'VIDEO') {
+          videoEl = parentEl.children[i];
+          if (this.isPeerVideo) {
+            if (this.isMin) {
+              videoEl.width = 320;
+              videoEl.height = 240;
+            } else {
+              videoEl.width = 1280;
+              videoEl.height = 720;
+            }
+          } else {
+            videoEl.width = 0;
+            videoEl.height = 0;
+          }
+        }
+      }
+    }
   }
 
   /**

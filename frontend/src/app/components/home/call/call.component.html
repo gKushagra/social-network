@@ -1,54 +1,56 @@
-<div class="call-div" fxLayout="column" [ngClass]="isMin ? 'min':'max'">
+<!-- outgoing call -->
+<div class="call-div" fxLayout="column" *ngIf="!isIncoming" [ngClass]="isMin ? 'min':'max'">
     <!-- calling to indication -->
-    <div *ngIf="!isIncoming" fxLayout="row">
+    <div fxLayout="row">
         <div fxFlex="5"></div>
-        <div class="mat-headline">{{ getUserEmail(data.peerId).split('@')[0] |uppercase}}</div>
+        <div class="mat-headline" style="margin-bottom: 0 !important;">{{ getUserEmail(data.peerId).split('@')[0]
+            |uppercase}}</div>
         <div fxFlex></div>
     </div>
 
     <!-- video display screen -->
-    <div *ngIf="!isIncoming" id="peer-video" [ngClass]="isMin ? 'min__peer-video':'max__peer-video'">
-        <div id="user-video" [ngClass]="isMin ? 'min__user-video':'max__user-video'"></div>
-    </div>
-
-    <div *ngIf="isIncoming" fxLayout="row" fxLayoutAlign="center center">
-        <div fxFlex="2"></div>
-        <div>
-            {{ 'Incoming call from ' + getUserEmail(data.peerId).split('@')[0] |uppercase}}
-        </div>
-        <div fxFlex></div>
-        <button (click)="answerCall()" mat-icon-button>
-            <mat-icon>ring_volume</mat-icon>
-        </button>
-        <button (click)="declineCall()" mat-icon-button>
-            <mat-icon>call_end</mat-icon>
-        </button>
-        <div fxFlex="2"></div>
+    <div id="peer-video" [ngClass]="isMin ? 'min__peer-video':'max__peer-video'">
+        <!-- <div id="user-video" [ngClass]="isMin ? 'min__user-video':'max__user-video'"></div> -->
     </div>
 
     <!-- call controls: audio, video, screen share -->
-    <div *ngIf="!isIncoming" fxLayout="row" fxLayoutAlign="center center">
+    <div fxLayout="row" fxLayoutAlign="center center">
         <button (click)="expandDisplay()" mat-icon-button>
             <mat-icon matTooltip="Maximize" *ngIf="isMin">open_in_full</mat-icon>
             <mat-icon matTooltip="Minimize" *ngIf="!isMin">close_fullscreen</mat-icon>
         </button>
         <button (click)="enDisAudio()" mat-icon-button>
-            <mat-icon matTooltip="Mute" *ngIf="!audio">mic</mat-icon>
-            <mat-icon matTooltip="Unmute" *ngIf="audio">mic_off</mat-icon>
+            <mat-icon matTooltip="Unmute" style="color: #BF360C;" *ngIf="!audio">mic_off</mat-icon>
+            <mat-icon matTooltip="Mute" *ngIf="audio">mic</mat-icon>
         </button>
         <div fxFlex="2"></div>
         <button (click)="endCall()" mat-icon-button>
-            <mat-icon matTooltip="End Call">call_end</mat-icon>
+            <mat-icon style="color: #BF360C;" matTooltip="End Call">call_end</mat-icon>
         </button>
         <div fxFlex="2"></div>
         <button (click)="enDisVideo()" mat-icon-button>
-            <mat-icon matTooltip="Video On" *ngIf="!video">videocam</mat-icon>
-            <mat-icon matTooltip="Video Off" *ngIf="video">videocam_off</mat-icon>
+            <mat-icon matTooltip="Turn On Video" style="color: #BF360C;" *ngIf="!video">videocam_off</mat-icon>
+            <mat-icon matTooltip="Turn Off Video" *ngIf="video">videocam</mat-icon>
         </button>
         <div fxFlex="2"></div>
         <button (click)="enDisScreenShare()" mat-icon-button>
             <mat-icon matTooltip="Share Screen" *ngIf="!screenShare">screen_share</mat-icon>
             <mat-icon matTooltip="Stop Screen Share" *ngIf="screenShare">stop_screen_share</mat-icon>
+        </button>
+    </div>
+</div>
+
+<!-- incoming call accept/decline -->
+<div class="call-div" *ngIf="isIncoming" fxLayout="column" fxLayoutAlign="space-evenly center">
+    <div class="mat-subheading-0">
+        {{ 'Incoming call from ' + getUserEmail(data.peerId).split('@')[0] |uppercase}}
+    </div>
+    <div>
+        <button (click)="answerCall()" style="color: #00C853;" mat-icon-button>
+            <mat-icon>ring_volume</mat-icon>
+        </button>
+        <button (click)="declineCall()" style="color: #BF360C;" mat-icon-button>
+            <mat-icon>call_end</mat-icon>
         </button>
     </div>
 </div>
