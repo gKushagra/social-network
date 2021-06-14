@@ -24,7 +24,7 @@ export class ChatService {
   getConversations(): void {
     this.http.get(environment.conversationsUrl + `/${this.userService.currUser.id}`)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         this.conversations = res.conversations;
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
@@ -40,7 +40,7 @@ export class ChatService {
     let isConvAvl = this.conversations.filter(_c => {
       return _c.users.indexOf(contact.contactUserId) >= 0
     });
-    console.log('called ',isConvAvl);
+    // console.log('called ',isConvAvl);
     if (isConvAvl.length > 0) {
       this.activeConversation = isConvAvl[0];
       this.currentConversation.next(this.activeConversation);
@@ -54,7 +54,7 @@ export class ChatService {
       // save in backend
       this.http.post(environment.conversationsUrl, newConv)
         .subscribe((res: any) => {
-          console.log(res);
+          // console.log(res);
           this.conversations.push(res.conversation);
           this.activeConversation = res.conversation;
         }, (error) => {

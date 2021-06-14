@@ -21,12 +21,12 @@ export class RequestLinkComponent implements OnInit {
   }
 
   tryResetLink(): void {
-    console.log(this.email.value);
+    // console.log(this.email.value);
 
     // send email to backend 
     this.authenticationService.requestResetLink(this.email.value)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
       }, () => {

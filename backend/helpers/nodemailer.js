@@ -21,7 +21,7 @@ function sendEmail(data) {
       html: data.html,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     throw new Error(error);
   }
 }

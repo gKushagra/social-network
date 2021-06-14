@@ -37,7 +37,7 @@ export class PostService {
     dialogConfig.minHeight = window.innerHeight;
     dialogConfig.minWidth = 3 * (window.innerWidth / 4);
     dialogConfig.data = data;
-    console.log(data);
+    // console.log(data);
     let externalLinkDialog = this.dialog.open(ExtLinkComponent, dialogConfig);
   }
 

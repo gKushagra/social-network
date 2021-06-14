@@ -15,5 +15,5 @@ app.use(cors());
 app.use(router);
 
 app.listen(4050, () => {
-  console.log("http server listening on 4050");
+  // console.log("http server listening on 4050");
 });

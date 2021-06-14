@@ -26,12 +26,12 @@ export class SignupComponent implements OnInit {
   }
 
   public trySignup(): void {
-    console.log(this.signupForm.value);
+    // console.log(this.signupForm.value);
 
     // send user data to signup endpoint
     this.authenticationService.signup(this.signupForm.value)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         sessionStorage.setItem('token', res.token);
         sessionStorage.setItem('_user', JSON.stringify(res.data));
         this.userService.currUser = res.data;

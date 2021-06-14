@@ -56,7 +56,7 @@ export class CallService {
       roomId: data.roomId,
       userId: this.userService.currUser.id
     }).subscribe((res: any) => {
-      console.log(res);
+      // console.log(res);
       token = res.token;
     }, (error) => {
       if (error.status === 500) console.log("Server Error");
@@ -77,7 +77,7 @@ export class CallService {
     // create new room
     this.createRoom(data)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         room = res.room;
         this.callHistory.outgoing.push(res.call);
         this.updateCallHistory.next(true);
@@ -89,7 +89,7 @@ export class CallService {
           roomId: room['uniqueName'],
           userId: this.userService.currUser.id
         }).subscribe((res: any) => {
-          console.log(res);
+          // console.log(res);
           token = res.token;
         }, (error) => {
           if (error.status === 500) console.log("Server Error");

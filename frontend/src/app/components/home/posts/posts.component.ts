@@ -47,7 +47,7 @@ export class PostsComponent implements OnInit {
   getPosts(): void {
     this.postsService.getPosts()
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         this.filterPosts(res.posts);
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
@@ -93,7 +93,7 @@ export class PostsComponent implements OnInit {
     post.postComments.push(newComment);
     this.postsService.updatePost(post)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         this.comment.reset()
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
@@ -109,7 +109,7 @@ export class PostsComponent implements OnInit {
   deletePost(postId: any): void {
     this.postsService.deletePost(postId)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         this.posts = this.posts.filter(post => { return post.postId !== res.postId });
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
@@ -127,7 +127,7 @@ export class PostsComponent implements OnInit {
     let newPostDialogRef = this.dialog.open(NewPostComponent, dialogConfig);
     newPostDialogRef.beforeClosed()
       .subscribe(data => {
-        console.log(data);
+        // console.log(data);
       });
   }
 
@@ -186,7 +186,7 @@ export class PostsComponent implements OnInit {
       newTabLinkEl.innerHTML = 'Open in new tab';
       newTabLinkEl.target = '_blank';
       linkEl.addEventListener('click', () => {
-        console.log(data.postExternalLink);
+        // console.log(data.postExternalLink);
         this.postsService.openExternalLink(data.postExternalLink);
       });
       linkEl.innerText = 'Open Link';

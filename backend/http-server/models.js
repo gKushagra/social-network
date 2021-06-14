@@ -14,7 +14,7 @@ UserSchema.methods.newUser = function (email, password) {
   this.id = uuid();
   this.email = email;
   this.hash = bcrypt.hashSync(password, 10);
-  console.log(this.id, this.email, this.hash);
+  // console.log(this.id, this.email, this.hash);
 };
 
 UserSchema.methods.updateHash = function (password) {

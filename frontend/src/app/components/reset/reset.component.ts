@@ -23,10 +23,10 @@ export class ResetComponent implements OnInit {
   }
 
   public tryReset(): void {
-    console.log(this.password.value, this.retypePassword.value);
+    // console.log(this.password.value, this.retypePassword.value);
 
     const token = this.route.snapshot.queryParamMap.get('token');
-    console.log(token);
+    // console.log(token);
 
     // send new pass to backend
     this.authenticationService.reset({ token: token, password: this.password.value })

@@ -26,12 +26,12 @@ export class LoginComponent implements OnInit {
   }
 
   public tryLogin(): void {
-    console.log(this.loginForm.value);
+    // console.log(this.loginForm.value);
 
     // send user login info to auth endpoint on server
     this.authenticationService.login(this.loginForm.value)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         sessionStorage.setItem('token', res.token);
         sessionStorage.setItem('_user', JSON.stringify(res.data));
         this.userService.currUser = res.data;

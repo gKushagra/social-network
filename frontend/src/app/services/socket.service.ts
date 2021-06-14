@@ -22,7 +22,7 @@ export class SocketService {
 
     // connection opened
     this.ws.onopen = (event) => {
-      console.log('connection open');
+      // console.log('connection open');
     }
 
     // new message from server
@@ -33,13 +33,13 @@ export class SocketService {
 
     // error in connection
     this.ws.onerror = (event) => {
-      console.log('error', event);
+      // console.log('error', event);
       this.reconnect();
     }
 
     // connection closed from server
     this.ws.onclose = (event) => {
-      console.log('connection closed from server side', event);
+      // console.log('connection closed from server side', event);
       this.reconnect();
     }
   }

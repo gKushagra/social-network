@@ -76,7 +76,7 @@ export class NewPostComponent implements OnInit {
 
     this.postsService.addPost(this.post)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         this.post = res.post;
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
@@ -90,7 +90,7 @@ export class NewPostComponent implements OnInit {
   updatePost(): void {
     this.postsService.updatePost(this.post)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         this.post = res.post;
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
@@ -120,7 +120,7 @@ export class NewPostComponent implements OnInit {
   uploadFile(files: FileList): void {
     this.postsService.uploadFile(files.item(0))
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         this.post.postFileLink = environment.filesUrl + '/' + res.filename;
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
@@ -144,7 +144,7 @@ export class NewPostComponent implements OnInit {
    * @param data post
    */
   showFiles(data: Post): void {
-    console.log(data.postFileLink);
+    // console.log(data.postFileLink);
     let ext = data.postFileLink.split('.')[1];
     if (this.postsService.imgTypes.indexOf(ext) >= 0) {
       let imgEl = document.createElement('img');
@@ -234,7 +234,7 @@ export class NewPostComponent implements OnInit {
     newTabLinkEl.innerHTML = 'Open in new tab';
     newTabLinkEl.target = '_blank';
     linkEl.addEventListener('click', () => {
-      console.log(data.postExternalLink);
+      // console.log(data.postExternalLink);
       this.postsService.openExternalLink(data.postExternalLink);
     });
     linkEl.innerText = 'Open Link';

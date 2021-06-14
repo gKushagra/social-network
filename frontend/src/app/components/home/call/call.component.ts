@@ -72,7 +72,7 @@ export class CallComponent implements OnInit {
       name: this.data.room['uniqueName'],
     }).then(room => {
       this.call = room;
-      console.log(`Successfully joined call: ${room}`);
+      // console.log(`Successfully joined call: ${room}`);
 
       if (this.isIncoming) this.isIncoming = false;
 
@@ -83,7 +83,6 @@ export class CallComponent implements OnInit {
       // existing remote tracks
       room.participants.forEach(participant => {
         participant.on('trackSubscribed', track => {
-          console.log(track);
           // append video el
           let parentEl = document.getElementById('peer-video');
           parentEl.appendChild(track.attach());
@@ -131,10 +130,9 @@ export class CallComponent implements OnInit {
 
       // new remote connected
       room.on('participantConnected', participant => {
-        console.log(`A participant connected: ${participant.identity}`);
+        // console.log(`A participant connected: ${participant.identity}`);
 
         participant.on('trackSubscribed', track => {
-          console.log(track);
           // append video el
           let parentEl = document.getElementById('peer-video');
           parentEl.appendChild(track.attach());
@@ -176,10 +174,10 @@ export class CallComponent implements OnInit {
 
       // new remote connected
       room.on('participantDisconnected', participant => {
-        console.log(`A participant disconnected: ${participant.identity}`);
+        // console.log(`A participant disconnected: ${participant.identity}`);
       });
     }, error => {
-      console.log(`Unable to connect to call: ${error.message}`);
+      // console.log(`Unable to connect to call: ${error.message}`);
     });
   }
 
@@ -252,7 +250,7 @@ export class CallComponent implements OnInit {
           }, 1500);
         })
         .catch(() => {
-          console.log(`Screen Share failed`);
+          // console.log(`Screen Share failed`);
         });
     }
     this.screenShare ? this.screenShare = false : this.screenShare = true;
@@ -304,7 +302,7 @@ export class CallComponent implements OnInit {
         // update call duration
         this.callService.updateCall({ callId: this.data.room['uniqueName'], duration: durationInMins })
           .subscribe((res: any) => {
-            console.log(res);
+            // console.log(res);
           }, (error) => {
             if (error.status === 500) console.log('Server Error');
           }, () => { });

@@ -33,12 +33,12 @@ wss.on('connection', function connection(ws) {
 
     // relay message
     ws.on('message', function incoming(data) {
-        console.log('received: %s', JSON.parse(data));
+        // console.log('received: %s', JSON.parse(data));
         let message = JSON.parse(data);
         if ('type' in message && message['type'] === "authentication") {
             ws["_id"] = message.data;
             wss.clients.forEach(client => {
-                console.log(client._id);
+                // console.log(client._id);
                 if (client._id === message.data) {
                     client.send(JSON.stringify(message));
                 }
@@ -47,16 +47,16 @@ wss.on('connection', function connection(ws) {
             (message['type'] === "call" ||
                 message['type'] === "call-declined" ||
                 message['type'] === "call-disconnected")) {
-            console.log(message);
+            // console.log(message);
             wss.clients.forEach(client => {
-                console.log(client._id);
+                // console.log(client._id);
                 if (client._id === message.toPeerId) {
                     client.send(JSON.stringify(message));
                 }
             });
         } else {
             wss.clients.forEach(client => {
-                console.log(client._id);
+                // console.log(client._id);
                 if (message.toUserId === client._id) {
                     client.send(JSON.stringify(message));
                 }
@@ -72,7 +72,7 @@ wss.on('connection', function connection(ws) {
                 wss.clients.delete(client);
             }
         });
-        console.log('error, connection closed', err);
+        // console.log('error, connection closed', err);
     });
 
     // close conn request from client
@@ -83,6 +83,6 @@ wss.on('connection', function connection(ws) {
                 wss.clients.delete(client);
             }
         });
-        console.log('connection closed');
+        // console.log('connection closed');
     });
 });

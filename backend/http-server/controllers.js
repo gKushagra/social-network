@@ -18,7 +18,7 @@ mongoose.connect(process.env.mongodbUrl, {
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
-  console.log("db connected");
+  // console.log("db connected");
 });
 
 require("./models");
@@ -32,7 +32,7 @@ const Call = mongoose.model("Call");
 
 const domain = `http://localhost:4240`
 
-console.log(path.join(__dirname + process.env.fileDir))
+// console.log(path.join(__dirname + process.env.fileDir))
 
 /**
  * This method checks if a user exists
@@ -41,12 +41,12 @@ console.log(path.join(__dirname + process.env.fileDir))
  * @param {*} res HTTP Response
  */
 const loginController = (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const data = req.body;
 
   User.find({ email: data.email }, (err, user) => {
     if (err) return res.sendStatus(500);
-    console.log(user);
+    // console.log(user);
     if (user.length > 0) {
       const _user = new User();
       const isVerified = _user.verifyUser(data.password, user[0].hash);
@@ -68,7 +68,7 @@ const loginController = (req, res) => {
  * @param {*} res HTTP Response
  */
 const signupController = (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const data = req.body;
 
   //   check if user with this email does not exist
@@ -81,7 +81,7 @@ const signupController = (req, res) => {
 
       user.newUser(data.email, data.password);
 
-      console.log(user);
+      // console.log(user);
 
       user.save((err, user) => {
         if (err) return res.sendStatus(500);
@@ -102,7 +102,7 @@ const signupController = (req, res) => {
  * @param {*} res HTTP Response
  */
 const resetController = (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const data = req.body;
 
   Reset.find({ resetToken: data.token }, (err, resetReq) => {
@@ -121,14 +121,14 @@ const resetController = (req, res) => {
         });
 
         user.updateHash(data.password);
-        console.log(user);
+        // console.log(user);
 
         User.updateOne(
           { id: resetReq[0].userId },
           { hash: user.hash },
           (err, doc) => {
             if (err) return res.sendStatus(500);
-            console.log(doc);
+            // console.log(doc);
 
             return res.status(200).json("password reset successfully");
           }
@@ -146,12 +146,12 @@ const resetController = (req, res) => {
  * @param {*} res HTTP Response
  */
 const getResetLinkController = (req, res) => {
-  console.log(req.params.email);
+  // console.log(req.params.email);
   const email = req.params.email;
   // check if user with this email exists
   User.find({ email: email }, (err, user) => {
     if (err) return res.sendStatus(500);
-    console.log(user);
+    // console.log(user);
     if (user.length > 0) {
       const reset = new Reset();
       const token = reset.addResetRequest(user[0].email, user[0].id);
@@ -510,7 +510,7 @@ const initiateCall = (req, res) => {
   User.find({ userId: data.fromUserId }, (err, user) => {
     if (err) return res.sendStatus(500);
 
-    console.log(user);
+    // console.log(user);
 
     if (user) {
       createRoom()

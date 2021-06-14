@@ -24,7 +24,7 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.isAuthenticated());
+    // console.log(this.isAuthenticated());
     if (!this.isAuthenticated()) {
       this.router.navigate(['login']);
     }
@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit {
 
     this.callService.getCallHistory()
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
         this.callService.callHistory = res.callHistory;
         this.callService.updateCallHistory.next(true);
       });

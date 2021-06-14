@@ -50,7 +50,7 @@ export class ChatComponent implements OnInit {
         let conv = this.chatService.conversations.filter(_conv => {
           return _conv.users.indexOf(msg.fromUserId) >= 0
         });
-        console.log(conv);
+        // console.log(conv);
         if (conv.length > 0) {
           if (this.activeConversation &&
             this.activeConversation.users.indexOf(msg.fromUserId) >= 0) {
@@ -106,7 +106,7 @@ export class ChatComponent implements OnInit {
   public closeConversation(): void {
     this.chatWindowActive = false;
     this.activeConversation = null;
-    console.log(this.chatWindowActive);
+    // console.log(this.chatWindowActive);
   }
 
   /**
@@ -118,7 +118,7 @@ export class ChatComponent implements OnInit {
   public newText(e: any): void {
     if (e.key === 'Enter') {
       e.preventDefault();
-      console.log(this.textMessage.value);
+      // console.log(this.textMessage.value);
       let newMsg: Message = {
         messageId: this.genNanoId(),
         fromUserId: this.userService.currUser.id,
@@ -131,7 +131,7 @@ export class ChatComponent implements OnInit {
       this.activeConversation.messages.push(newMsg);
       this.chatService.updateConversation(this.activeConversation)
         .subscribe((res: any) => {
-          console.log(res);
+          // console.log(res);
         }, (error) => {
           if (error.status === 500) console.log("Server Error");
         }, () => {
@@ -151,7 +151,7 @@ export class ChatComponent implements OnInit {
     let sendMediaDialogRef = this.dialog.open(SendMediaComponent, dialogConfig);
     sendMediaDialogRef.beforeClosed().subscribe(data => {
       if (data && data.fileLink || data.externalLink) {
-        console.log(data);
+        // console.log(data);
         let newMsg: Message = {
           messageId: this.genNanoId(),
           fromUserId: this.userService.currUser.id,
@@ -164,7 +164,7 @@ export class ChatComponent implements OnInit {
         this.activeConversation.messages.push(newMsg);
         this.chatService.updateConversation(this.activeConversation)
           .subscribe((res: any) => {
-            console.log(res);
+            // console.log(res);
           }, (error) => {
             if (error.status === 500) console.log("Server Error");
           }, () => {
@@ -227,7 +227,7 @@ export class ChatComponent implements OnInit {
       let linkEl = document.createElement('button');
       linkEl.id = `ifr_${data.messageId}`;
       linkEl.addEventListener('click', () => {
-        console.log(data.externalLink);
+        // console.log(data.externalLink);
         this.postsService.openExternalLink(data.externalLink);
       });
       linkEl.innerText = 'Open Link';

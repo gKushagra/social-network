@@ -42,7 +42,7 @@ export class ContactsComponent implements OnInit {
 
     // get contacts for user
     this.contacts = this.userService.contacts;
-    console.log(this.contacts);
+    // console.log(this.contacts);
 
     // remove curr user and contacts
     this.options = this.options.filter(user => {
@@ -65,7 +65,7 @@ export class ContactsComponent implements OnInit {
           return user.id !== this.userService.currUser.id &&
             this.contacts.findIndex(c => c.contactUserId === user.id) < 0
         });
-        console.log(this.options);
+        // console.log(this.options);
       }
     });
 
@@ -73,7 +73,7 @@ export class ContactsComponent implements OnInit {
     this.userService.observeAvlContacts.subscribe(avl => {
       if (avl) {
         this.contacts = this.userService.contacts;
-        console.log(this.contacts);
+        // console.log(this.contacts);
       }
     });
 
@@ -82,7 +82,7 @@ export class ContactsComponent implements OnInit {
       if (avl) {
         this.requests = this.userService.requests;
         this.sentRequests = this.userService.sentRequests;
-        console.log(this.requests, this.sentRequests);
+        // console.log(this.requests, this.sentRequests);
       }
     });
 
@@ -145,7 +145,7 @@ export class ContactsComponent implements OnInit {
    * @param contact 
    */
   callContact(contact: Contact): void {
-    console.log('call initiated');
+    // console.log('call initiated');
 
     let callObj: Call = {
       callId: null,
@@ -168,7 +168,7 @@ export class ContactsComponent implements OnInit {
       userId: _user.id,
       userEmail: _user.email
     }).subscribe((res: any) => {
-      console.log(res);
+      // console.log(res);
     }, (error) => {
       // server error
       if (error.status === 500) console.log("Server Error");
@@ -184,7 +184,7 @@ export class ContactsComponent implements OnInit {
   public removeContact(_user: any): void {
     this.userService.removeContact(_user.contactUserId)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
       }, () => {
@@ -201,7 +201,7 @@ export class ContactsComponent implements OnInit {
       fromUserId: this.userService.currUser.id,
       toUserId: _user.id
     }).subscribe((res: any) => {
-      console.log(res);
+      // console.log(res);
     }, (error) => {
       if (error.status === 500) console.log("Server Error");
     }, () => {
@@ -222,7 +222,7 @@ export class ContactsComponent implements OnInit {
       toUserId: request.toUserId,
       toUserEmail: this.getUserEmail(request.toUserId)
     }).subscribe((res: any) => {
-      console.log(res);
+      // console.log(res);
     }, (error) => {
       if (error.status === 500) console.log("Server Error");
     }, () => {
@@ -237,7 +237,7 @@ export class ContactsComponent implements OnInit {
   cancelRequest(request: Request): void {
     this.userService.declineRequest(request.requestId)
       .subscribe((res: any) => {
-        console.log(res);
+        // console.log(res);
       }, (error) => {
         if (error.status === 500) console.log("Server Error");
       }, () => {
