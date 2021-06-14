@@ -304,7 +304,7 @@ export class ContactsComponent implements OnInit {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('_user');
     this.socketService.close();
-    window.location.replace('http://localhost:4240/login');
+    window.location.replace('https://social-network.opensourced.in/login');
   }
 
 }

@@ -15,17 +15,16 @@ export const environment = {
   callUrl: "http://localhost:4050/calls",
   socketUrl: 'ws://localhost:4051',
   reconnectInterval: 2000,
-  // authenticationUrl: "http://api.social-network.fullstackengineers.co.in/auth/",
-  // usersUrl: "http://api.social-network.fullstackengineers.co.in/users",
-  // contactsUrl: "http://api.social-network.fullstackengineers.co.in/contacts",
-  // requestUrl: "http://api.social-network.fullstackengineers.co.in/requests",
-  // postsUrl: "http://api.social-network.fullstackengineers.co.in/posts",
-  // filesUrl: "http://api.social-network.fullstackengineers.co.in/files",
-  // conversationsUrl: "http://api.social-network.fullstackengineers.co.in/conversations",
-  // linksUrl: "http://api.social-network.fullstackengineers.co.in/links",
-  // callUrl: "http://api.social-network.fullstackengineers.co.in/calls",
-  // socketUrl: 'ws://ws.social-network.fullstackengineers.co.in',
-  // reconnectInterval: 2000
+  // authenticationUrl: "https://api.social-network.fullstackengineers.co.in/auth/",
+  // usersUrl: "https://api.social-network.fullstackengineers.co.in/users",
+  // contactsUrl: "https://api.social-network.fullstackengineers.co.in/contacts",
+  // requestUrl: "https://api.social-network.fullstackengineers.co.in/requests",
+  // postsUrl: "https://api.social-network.fullstackengineers.co.in/posts",
+  // filesUrl: "https://api.social-network.fullstackengineers.co.in/files",
+  // conversationsUrl: "https://api.social-network.fullstackengineers.co.in/conversations",
+  // linksUrl: "https://api.social-network.fullstackengineers.co.in/links",
+  // callUrl: "https://api.social-network.fullstackengineers.co.in/calls",
+  // socketUrl: 'wss://ws.social-network.fullstackengineers.co.in',
 };
 
 /*
