@@ -30,7 +30,7 @@ const Post = mongoose.model("Post");
 const Conversation = mongoose.model("Conversation");
 const Call = mongoose.model("Call");
 
-const domain = `http://localhost:4240`
+const domain = `https://social-network.opensourced.in`
 
 // console.log(path.join(__dirname + process.env.fileDir))
 
