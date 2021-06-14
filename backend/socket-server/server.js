@@ -4,7 +4,7 @@ const wss = new WebSocket.Server({ port: 4051 });
 
 wss.on('connection', function connection(ws) {
 
-    console.log('client connected');
+    // console.log('client connected');
 
     // wss.clients.forEach(client => {
     //     console.log(client._id);
