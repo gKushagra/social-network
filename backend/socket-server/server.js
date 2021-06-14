@@ -1,6 +1,12 @@
+require('dotenv').config();
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: 4051 });
+const wss = new WebSocket.Server({
+    port: 4051,
+    ssl: true,
+    ssl_key: process.env.certKey,
+    ssl_cert: process.env.cert
+});
 
 wss.on('connection', function connection(ws) {
 
