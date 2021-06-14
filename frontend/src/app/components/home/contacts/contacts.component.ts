@@ -151,7 +151,8 @@ export class ContactsComponent implements OnInit {
       callId: null,
       fromUserId: this.userService.currUser.id,
       toUserId: contact.contactUserId,
-      callDate: null
+      callDate: null,
+      duration: 0,
     }
 
     this.callService.notifyOutgoingCall(callObj);

@@ -100,7 +100,8 @@ const CallSchema = new Schema({
   callId: String,
   fromUserId: String,
   toUserId: String,
-  callDate: Date
+  callDate: Date,
+  duration: Number,
 });
 
 mongoose.model("Call", CallSchema);

@@ -520,7 +520,8 @@ const initiateCall = (req, res) => {
             callId: room.uniqueName,
             fromUserId: data.fromUserId,
             toUserId: data.toUserId,
-            callDate: new Date()
+            callDate: new Date(),
+            duration: 0,
           });
 
           newCall.save((err, c) => {
@@ -586,6 +587,20 @@ const getCallHistory = (req, res) => {
   });
 }
 
+/**
+ * update call duration
+ * @param {*} req HTTP Request
+ * @param {*} res HTTP Response
+ */
+const updateCall = (req, res) => {
+  const data = req.body;
+  Call.findOneAndUpdate({ callId: data.callId }, { duration: data.duration }, (err, c) => {
+    if (err) return res.sendStatus(500);
+
+    return res.status(200).json('call updated');
+  });
+}
+
 const getLinkPreviewInfo = async (req, res) => {
   return res.sendStatus(500);
   // try {
@@ -626,4 +641,5 @@ module.exports = {
   getAccessToken,
   endRoom,
   getCallHistory,
+  updateCall,
 };

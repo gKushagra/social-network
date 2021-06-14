@@ -46,5 +46,6 @@ export interface Call {
     callId: string,
     fromUserId: string,
     toUserId: string,
-    callDate: Date
+    callDate: Date,
+    duration: Number,
 }

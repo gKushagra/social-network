@@ -43,7 +43,10 @@ wss.on('connection', function connection(ws) {
                     client.send(JSON.stringify(message));
                 }
             });
-        } if ('type' in message && message['type'] === "call") {
+        } if ('type' in message &&
+            (message['type'] === "call" ||
+                message['type'] === "call-declined" ||
+                message['type'] === "call-disconnected")) {
             console.log(message);
             wss.clients.forEach(client => {
                 console.log(client._id);

@@ -137,8 +137,10 @@
                                 <div fxFlex="row" fxLayoutAlign="start center" style="width: 100%;">
                                     <div fxFlex="2"></div>
                                     <div>{{ getUserEmail(call.fromUserId).split('@')[0] |lowercase}}</div>
-                                    <div fxFlex="10"></div>
+                                    <div fxFlex="2"></div>
                                     <small>{{ call.callDate |date:'short' }}</small>
+                                    <div fxFlex="2"></div>
+                                    <small>{{ call.duration + ' mins' }}</small>
                                     <div fxFlex></div>
                                 </div>
                             </div>
@@ -151,6 +153,8 @@
                                     <div>{{ getUserEmail(call.toUserId).split('@')[0] |lowercase}}</div>
                                     <div fxFlex="10"></div>
                                     <small>{{ call.callDate |date:'short' }}</small>
+                                    <div fxFlex="2"></div>
+                                    <small>{{ call.duration + ' mins' }}</small>
                                     <div fxFlex></div>
                                 </div>
                             </div>

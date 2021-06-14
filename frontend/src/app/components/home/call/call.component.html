@@ -1,20 +1,24 @@
 <!-- outgoing call -->
-<div class="call-div" fxLayout="column" *ngIf="!isIncoming" [ngClass]="isMin ? 'min':'max'">
+<div class="call-div" fxLayout="column" *ngIf="!isIncoming && !isDeclined && !isDisconnected"
+    [ngClass]="isMin ? 'min':'max'">
     <!-- calling to indication -->
     <div fxLayout="row">
-        <div fxFlex="5"></div>
-        <div class="mat-headline" style="margin-bottom: 0 !important;">
-            {{ getUserEmail(data.peerId).split('@')[0] |uppercase}}
-        </div>
-        <div fxFlex="2">
-            <div style="font-size: 12px !important;" fxLayout="row">
-                <mat-icon *ngIf="isPeerAudio">mic</mat-icon>
-                <mat-icon style="color: #BF360C;" *ngIf="!isPeerAudio">mic_off</mat-icon>
-                <mat-icon *ngIf="isPeerVideo">videocam</mat-icon>
-                <mat-icon style="color: #BF360C;" *ngIf="!isPeerVideo">videocam_off</mat-icon>
-                <mat-icon *ngIf="isPeerScreenShare">screen_share</mat-icon>
-            </div>
-        </div>
+        <mat-chip-list>
+            <mat-chip (selectable)="false" (removable)="false">
+                <div class="mat-headline" style="margin-bottom: 0 !important;">
+                    {{ getUserEmail(data.peerId).split('@')[0] |uppercase}}
+                </div>
+                <div fxFlex="2">
+                    <div style="font-size: 12px !important;" fxLayout="row">
+                        <mat-icon *ngIf="isPeerAudio">mic</mat-icon>
+                        <mat-icon style="color: #BF360C;" *ngIf="!isPeerAudio">mic_off</mat-icon>
+                        <mat-icon *ngIf="isPeerVideo">videocam</mat-icon>
+                        <mat-icon style="color: #BF360C;" *ngIf="!isPeerVideo">videocam_off</mat-icon>
+                        <mat-icon *ngIf="isPeerScreenShare">screen_share</mat-icon>
+                    </div>
+                </div>
+            </mat-chip>
+        </mat-chip-list>
         <div fxFlex></div>
     </div>
 
@@ -63,4 +67,16 @@
             <mat-icon>call_end</mat-icon>
         </button>
     </div>
+</div>
+
+<!-- call declined -->
+<div class="call-div" *ngIf="isDeclined" fxLayout="column" fxLayoutAlign="space-evenly center">
+    <p>Call Declined by {{ getUserEmail(data.peerId).split('@')[0] }}</p>
+    <small>window will close in 5s</small>
+</div>
+
+<!-- call disconnected -->
+<div class="call-div" *ngIf="isDisconnected" fxLayout="column" fxLayoutAlign="space-evenly center">
+    <p>Call Disconnected by {{ getUserEmail(data.peerId).split('@')[0] }}</p>
+    <small>window will close in 5s</small>
 </div>

@@ -1,5 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit } from '@angular/core';
 import { CallService } from 'src/app/services/call.service';
 import { SocketService } from 'src/app/services/socket.service';
 import { UserService } from 'src/app/services/user.service';
@@ -23,6 +22,8 @@ export class CallComponent implements OnInit {
     = false;
   screenShareTrack: any;          // screen track prop
   isIncoming: boolean = false;    // is call incoming
+  isDeclined: boolean = false;    // call declined by peer
+  isDisconnected: boolean = false;// peer disconnected
 
   // { token, room, peerId }
   constructor(
@@ -40,6 +41,23 @@ export class CallComponent implements OnInit {
       this.joinCall();
       this.notifyPeer();
     }
+
+    // subscribe to any new message available
+    this.socketService.observeNewMessage.subscribe(msg => {
+      if ('type' in msg && msg['type'] === "call-disconnected") {
+        this.isDisconnected = true;
+        setTimeout(() => {
+          this.endCall();
+        }, 5000);
+      }
+
+      if ('type' in msg && msg['type'] === "call-declined") {
+        this.isDeclined = true;
+        setTimeout(() => {
+          this.endCall();
+        }, 5000);
+      }
+    });
   }
 
   /**
@@ -70,7 +88,8 @@ export class CallComponent implements OnInit {
           let parentEl = document.getElementById('peer-video');
           parentEl.appendChild(track.attach());
           for (let i = 0; i < parentEl.children.length; i++) {
-            if (parentEl.children[i].tagName === 'VIDEO') {
+            if (parentEl.children[i].tagName === 'VIDEO'
+              && !parentEl.children[i].id) {
               parentEl.children[i].id = track.name;
             }
           }
@@ -95,6 +114,19 @@ export class CallComponent implements OnInit {
             }
           });
         });
+
+        participant.on('trackUnsubscribed', track => {
+          if (track.kind === 'video' && track.name !== 'camera') {
+            let parentEl = document.getElementById('peer-video');
+            for (let i = 0; i < parentEl.children.length; i++) {
+              if (parentEl.children[i].tagName === 'VIDEO' &&
+                parentEl.children[i].id !== 'camera') {
+                parentEl.children[i].remove();
+              }
+            }
+            this.isPeerScreenShare = false;
+          }
+        });
       });
 
       // new remote connected
@@ -107,7 +139,8 @@ export class CallComponent implements OnInit {
           let parentEl = document.getElementById('peer-video');
           parentEl.appendChild(track.attach());
           for (let i = 0; i < parentEl.children.length; i++) {
-            if (parentEl.children[i].tagName === 'VIDEO') {
+            if (parentEl.children[i].tagName === 'VIDEO' &&
+              !parentEl.children[i].id) {
               parentEl.children[i].id = track.name;
             }
           }
@@ -125,6 +158,19 @@ export class CallComponent implements OnInit {
             this.isPeerVideo = true;
             this.adjustVideoSize();
           });
+        });
+
+        participant.on('trackUnsubscribed', track => {
+          if (track.kind === 'video' && track.name !== 'camera') {
+            let parentEl = document.getElementById('peer-video');
+            for (let i = 0; i < parentEl.children.length; i++) {
+              if (parentEl.children[i].tagName === 'VIDEO' &&
+                parentEl.children[i].id !== 'camera') {
+                parentEl.children[i].remove();
+              }
+            }
+            this.isPeerScreenShare = false;
+          }
         });
       });
 
@@ -227,10 +273,40 @@ export class CallComponent implements OnInit {
     // disconnect call
     this.call.disconnect();
 
+    // notify peer
+    this.socketService.sendMessage({
+      type: 'call-disconnected',
+      roomId: this.data.room['uniqueName'],
+      toPeerId: this.data.peerId,
+      fromPeerId: this.userService.currUser.id
+    });
+
     // remove elements
     let parentEl = document.getElementById('peer-video');
-    for (let i = 0; i < parentEl.children.length; i++) {
-      parentEl.children[i].remove();
+    if (parentEl && parentEl.hasChildNodes()) {
+      for (let i = 0; i < parentEl.children.length; i++) {
+        parentEl.children[i].remove();
+      }
+    }
+
+    // calc call duration and update on caller side
+    if (this.callService.outgoingCall) {
+      let callInHistory = this.callService.callHistory.incoming.filter(_c => {
+        return _c.callId === this.data.room['uniqueName']
+      })[0];
+
+      let callStartTime = new Date(callInHistory.callDate).getTime();
+      let callEndTime = new Date().getTime();
+      let durationInMins = Math.round((((callEndTime - callStartTime) % 86400000) % 3600000) / 60000);
+      callInHistory.duration = durationInMins;
+
+      // update call duration
+      this.callService.updateCall({ callId: this.data.room['uniqueName'], duration: durationInMins })
+        .subscribe((res: any) => {
+          console.log(res);
+        }, (error) => {
+          if (error.status === 500) console.log('Server Error');
+        }, () => { });
     }
 
     // set null
@@ -263,6 +339,14 @@ export class CallComponent implements OnInit {
    */
   declineCall(): void {
     // notify other user
+    this.socketService.sendMessage({
+      type: 'call-declined',
+      roomId: this.data.room['uniqueName'],
+      toPeerId: this.data.peerId,
+      fromPeerId: this.userService.currUser.id
+    });
+
+    this.callService._call.next(20);
   }
 
   /**

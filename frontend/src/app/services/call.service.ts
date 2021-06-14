@@ -16,7 +16,10 @@ export class CallService {
   public _call: Subject<Number> = new Subject();
   public obsrvCall: Observable<Number> = this._call.asObservable();
 
-  public callHistory: any[] = [];
+  public callHistory: any = {
+    incoming: [],
+    outgoing: []
+  }
   public updateCallHistory: Subject<any> = new Subject();
   public obsrvUpdateCallHistory: Observable<any> = this.updateCallHistory.asObservable();
 
@@ -39,6 +42,10 @@ export class CallService {
 
   endRoom(roomId): any {
     return this.http.get(environment.callUrl + `/${roomId}`);
+  }
+
+  updateCall(payload: any): any {
+    return this.http.put(environment.callUrl, payload);
   }
 
   notifyIncomingCall(data: any): void {
@@ -72,7 +79,7 @@ export class CallService {
       .subscribe((res: any) => {
         console.log(res);
         room = res.room;
-        this.callHistory = res.call;
+        this.callHistory.outgoing.push(res.call);
         this.updateCallHistory.next(true);
       }, (error) => {
         if (error.status === 500) console.log("Server Error");

@@ -27,6 +27,7 @@ const {
     getAccessToken,
     endRoom,
     getCallHistory,
+    updateCall,
 } = require('./controllers');
 
 const router = express.Router();
@@ -86,6 +87,8 @@ router.get('/calls/:id', getCallHistory);
 router.post('/calls', initiateCall);
 
 router.post('/calls/token', getAccessToken);
+
+router.put('/calls', updateCall);
 
 // router.get('/calls/:id', endRoom);
 
