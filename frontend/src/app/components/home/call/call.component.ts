@@ -21,6 +21,7 @@ export class CallComponent implements OnInit {
   screenShare: boolean = false;   // is sharing screen
   isPeerScreenShare: boolean      // is peer screen share on
     = false;
+  screenShareTrack: any;          // screen track prop
   isIncoming: boolean = false;    // is call incoming
 
   // { token, room, peerId }
@@ -45,11 +46,11 @@ export class CallComponent implements OnInit {
    * join room
    */
   joinCall(): void {
-    console.log(this.data);
+    // console.log(this.data);
     // @ts-ignore
     Twilio.Video.connect(this.data.token, {
-      audio: true,
-      video: true,
+      audio: { name: 'microphone' },
+      video: { name: 'camera' },
       name: this.data.room['uniqueName'],
     }).then(room => {
       this.call = room;
@@ -63,26 +64,35 @@ export class CallComponent implements OnInit {
 
       // existing remote tracks
       room.participants.forEach(participant => {
-        participant.tracks.forEach(publication => {
-          if (publication.track) {
-            document.getElementById('peer-video').appendChild(publication.track.attach());
-          }
-        });
-
         participant.on('trackSubscribed', track => {
+          console.log(track);
           // append video el
-          document.getElementById('peer-video').appendChild(track.attach());
+          let parentEl = document.getElementById('peer-video');
+          parentEl.appendChild(track.attach());
+          for (let i = 0; i < parentEl.children.length; i++) {
+            if (parentEl.children[i].tagName === 'VIDEO') {
+              parentEl.children[i].id = track.name;
+            }
+          }
           // adjust peer video el dimen
           this.adjustVideoSize();
-          // listen to peer video disable
+          // if track name is not camera, it is screen share video
+          if (track.kind === 'video' && track.name !== 'camera') this.isPeerScreenShare = true;
+          // listen to peer audio/video disable
           track.on('disabled', () => {
-            this.isPeerVideo = false;
-            this.adjustVideoSize();
+            if (track.kind === 'audio') this.isPeerAudio = false;
+            if (track.kind === 'video') {
+              this.isPeerVideo = false;
+              this.adjustVideoSize();
+            }
           });
-          // listen to peer video enable
+          // listen to peer audio/video enable
           track.on('enabled', () => {
-            this.isPeerVideo = true;
-            this.adjustVideoSize();
+            if (track.kind === 'audio') this.isPeerAudio = true;
+            if (track.kind === 'video') {
+              this.isPeerVideo = true;
+              this.adjustVideoSize();
+            }
           });
         });
       });
@@ -91,18 +101,20 @@ export class CallComponent implements OnInit {
       room.on('participantConnected', participant => {
         console.log(`A participant connected: ${participant.identity}`);
 
-        participant.tracks.forEach(publication => {
-          if (publication.isSubscribed) {
-            const track = publication.track;
-            document.getElementById('peer-video').appendChild(track.attach());
-          }
-        });
-
         participant.on('trackSubscribed', track => {
+          console.log(track);
           // append video el
-          document.getElementById('peer-video').appendChild(track.attach());
+          let parentEl = document.getElementById('peer-video');
+          parentEl.appendChild(track.attach());
+          for (let i = 0; i < parentEl.children.length; i++) {
+            if (parentEl.children[i].tagName === 'VIDEO') {
+              parentEl.children[i].id = track.name;
+            }
+          }
           // adjust peer video el dimen
           this.adjustVideoSize();
+          // if track name is not camera, it is screen share video
+          if (track.kind === 'video' && track.name !== 'camera') this.isPeerScreenShare = true;
           // listen to peer video disable
           track.on('disabled', () => {
             this.isPeerVideo = false;
@@ -130,7 +142,7 @@ export class CallComponent implements OnInit {
    * joining room
    */
   notifyPeer(): void {
-    console.log(this.data);
+    // console.log(this.data);
     this.socketService.sendMessage({
       type: 'call',
       roomId: this.data.room['uniqueName'],
@@ -165,25 +177,32 @@ export class CallComponent implements OnInit {
    * start stop screen share
    */
   enDisScreenShare(): void {
-    let screenTrack;
     if (this.screenShare) {
-      this.call.localParticipant.unpublishTrack(screenTrack);
-      screenTrack.stop();
-      screenTrack = null;
+      this.call.localParticipant.unpublishTrack(this.screenShareTrack);
+      this.screenShareTrack.stop();
+      this.screenShareTrack = null;
     } else {
       // @ts-ignore
       navigator.mediaDevices.getDisplayMedia()
         .then(stream => {
           // disable video to enable screen share
           this.call.localParticipant.videoTracks.forEach(publication => {
-            if (this.video) publication.track.disable();
+            // console.log(publication);
+            if (this.video && publication.trackName === 'camera') publication.track.disable();
           });
           this.video = false;
 
           setTimeout(() => {
             // @ts-ignore
-            screenTrack = new Twilio.Video.LocalVideoTrack(stream.getTracks()[0]);
-            this.call.localParticipant.publishTrack(screenTrack);
+            this.screenShareTrack = new Twilio.Video.LocalVideoTrack(stream.getTracks()[0]);
+            this.call.localParticipant.publishTrack(this.screenShareTrack);
+
+            stream.getVideoTracks()[0].onended = () => {
+              this.call.localParticipant.unpublishTrack(this.screenShareTrack);
+              this.screenShareTrack.stop();
+              this.screenShareTrack = null;
+              this.screenShare ? this.screenShare = false : this.screenShare = true;
+            }
           }, 1500);
         })
         .catch(() => {
@@ -198,6 +217,7 @@ export class CallComponent implements OnInit {
    */
   endCall(): void {
     this.call.localParticipant.tracks.forEach(publication => {
+      // console.log(publication);
       const attachedElements = publication.track.detach();
       attachedElements.forEach(element => {
         element.remove();
@@ -206,6 +226,12 @@ export class CallComponent implements OnInit {
 
     // disconnect call
     this.call.disconnect();
+
+    // remove elements
+    let parentEl = document.getElementById('peer-video');
+    for (let i = 0; i < parentEl.children.length; i++) {
+      parentEl.children[i].remove();
+    }
 
     // set null
     if (this.callService.incomingCall) this.callService.incomingCall = null;
@@ -248,7 +274,8 @@ export class CallComponent implements OnInit {
     if (parentEl.children && parentEl.children.length > 0) {
       for (let i = 0; i < parentEl.children.length; i++) {
         let videoEl;
-        if (parentEl.children[i].tagName === 'VIDEO') {
+        if (parentEl.children[i].tagName === 'VIDEO'
+          && parentEl.children[i].id === 'camera') {
           videoEl = parentEl.children[i];
           if (this.isPeerVideo) {
             if (this.isMin) {
@@ -261,6 +288,16 @@ export class CallComponent implements OnInit {
           } else {
             videoEl.width = 0;
             videoEl.height = 0;
+          }
+        } else if (parentEl.children[i].tagName === 'VIDEO'
+          && parentEl.children[i].id !== 'camera') {
+          videoEl = parentEl.children[i];
+          if (this.isMin) {
+            videoEl.width = 320;
+            videoEl.height = 240;
+          } else {
+            videoEl.width = 1280;
+            videoEl.height = 720;
           }
         }
       }

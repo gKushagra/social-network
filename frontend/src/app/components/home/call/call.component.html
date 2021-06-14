@@ -3,8 +3,18 @@
     <!-- calling to indication -->
     <div fxLayout="row">
         <div fxFlex="5"></div>
-        <div class="mat-headline" style="margin-bottom: 0 !important;">{{ getUserEmail(data.peerId).split('@')[0]
-            |uppercase}}</div>
+        <div class="mat-headline" style="margin-bottom: 0 !important;">
+            {{ getUserEmail(data.peerId).split('@')[0] |uppercase}}
+        </div>
+        <div fxFlex="2">
+            <div style="font-size: 12px !important;" fxLayout="row">
+                <mat-icon *ngIf="isPeerAudio">mic</mat-icon>
+                <mat-icon style="color: #BF360C;" *ngIf="!isPeerAudio">mic_off</mat-icon>
+                <mat-icon *ngIf="isPeerVideo">videocam</mat-icon>
+                <mat-icon style="color: #BF360C;" *ngIf="!isPeerVideo">videocam_off</mat-icon>
+                <mat-icon *ngIf="isPeerScreenShare">screen_share</mat-icon>
+            </div>
+        </div>
         <div fxFlex></div>
     </div>
 
